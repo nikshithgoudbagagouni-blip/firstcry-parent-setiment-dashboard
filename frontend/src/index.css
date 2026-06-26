@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-[#FAF7F2] text-[#4A433A] font-sans antialiased overflow-x-hidden;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(255, 133, 98, 0.08) 0px, transparent 40%),
+      radial-gradient(at 100% 100%, rgba(136, 176, 151, 0.08) 0px, transparent 40%);
+    background-attachment: fixed;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+::-webkit-scrollbar-thumb {
+  background: #E6DDD0;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D5C9BA;
+}
+
+/* Custom Utilities - LittleBloom Academy Aesthetic */
+.glass-panel {
+  @apply bg-white/95 backdrop-blur-md border border-[#E6DDD0] rounded-[24px] shadow-[0_12px_40px_-15px_rgba(74,67,58,0.06)] transition-all duration-300;
+}
+
+.glass-panel-hover {
+  @apply hover:border-[#FF8562]/30 hover:shadow-[0_16px_48px_-12px_rgba(255,133,98,0.09)] hover:-translate-y-0.5;
+}
+
+.btn-primary {
+  @apply px-5 py-3 bg-[#FF8562] hover:bg-[#FF744F] text-white font-semibold rounded-2xl shadow-md shadow-[#FF8562]/10 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer;
+}
+
+.btn-secondary {
+  @apply px-5 py-3 bg-[#E5EFEA] hover:bg-[#DCEAE3] border border-[#CBDCD2] text-[#426453] font-semibold rounded-2xl active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer;
+}
+
+.form-input {
+  @apply w-full px-4 py-3 bg-[#FCFAF7] border border-[#E6DDD0] rounded-2xl focus:outline-none focus:border-[#FF8562] focus:ring-2 focus:ring-[#FF8562]/10 text-[#4A433A] placeholder-[#9E9588] transition-all duration-200;
+}
+
+/* Ensure inputs with absolute-positioned icons have correct left padding */
+.relative svg + .form-input,
+.relative svg + select.form-input {
+  padding-left: 2.75rem !important;
+}
+
+.form-label {
+  @apply block text-xs font-bold text-[#6B6152] uppercase tracking-wider mb-2;
+}
+
+/* Status Badges */
+.badge-positive {
+  @apply px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9] text-xs font-bold rounded-full;
+}
+
+.badge-neutral {
+  @apply px-3 py-1 bg-[#F5F5F5] text-[#616161] border border-[#E0E0E0] text-xs font-bold rounded-full;
+}
+
+.badge-negative {
+  @apply px-3 py-1 bg-[#FFEBEE] text-[#C62828] border border-[#FFCDD2] text-xs font-bold rounded-full;
+}
+
+.badge-alert {
+  @apply px-3 py-1 bg-[#FFF8E1] text-[#F57F17] border border-[#FFE082] text-xs font-bold rounded-full animate-pulse;
+}
+
+/* Animations */
+@keyframes glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.glow-glow {
+  animation: glow 8s ease-in-out infinite;
+}
+
+/* Typography and Contrast Overrides for Bright Mode */
+h1, h2, h3, h4, 
+.text-white, 
+.text-slate-100, 
+.text-slate-200, 
+.text-slate-105 {
+  color: #4A433A !important;
+}
+
+.text-slate-400, 
+.text-slate-450, 
+.text-slate-500, 
+.text-slate-350, 
+.text-slate-455 {
+  color: #7D7263 !important;
+}
+
+/* Retain white color inside primary buttons */
+.btn-primary,
+.btn-primary * {
+  color: #FFFFFF !important;
+}
+
+/* Secondary button text colors */
+.btn-secondary,
+.btn-secondary * {
+  color: #426453 !important;
+}
+
+/* Retain exact colors for badges and status indicators */
+.badge-positive { color: #2E7D32 !important; }
+.badge-neutral { color: #616161 !important; }
+.badge-negative { color: #C62828 !important; }
+.badge-alert { color: #F57F17 !important; }
+
+/* Status highlight colors */
+.text-emerald-400, .text-emerald-450 { color: #2E7D32 !important; }
+.text-rose-400, .text-rose-450 { color: #C62828 !important; }
+.text-amber-400, .text-amber-450 { color: #F57F17 !important; }
+.text-cyan-400 { color: #3E8B9E !important; }
+.text-indigo-400 { color: #FF8562 !important; }
+.text-violet-400 { color: #8F60A3 !important; }
