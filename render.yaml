@@ -11,5 +11,5 @@ services:
       - key: MONGO_URI
         sync: false
       - key: PORT
-        value: 10000
+        value: "10000"
     healthCheckPath: /api/status
