@@ -19,7 +19,7 @@ export default function App() {
 
   // Define backend connection endpoint.
   // In production, fallback to local origin since we serve the frontend bundle.
-  const backendUrl = process.env.NODE_ENV === 'production' 
+  const backendUrl = import.meta.env.PROD 
     ? window.location.origin 
     : 'http://localhost:5001';
 

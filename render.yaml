@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: firstcry-sentiment-dashboard
+    env: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: PORT
+        value: 10000
+    healthCheckPath: /api/status
