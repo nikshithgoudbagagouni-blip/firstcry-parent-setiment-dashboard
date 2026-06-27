@@ -18,9 +18,9 @@ export default function App() {
   const [selectedParentId, setSelectedParentId] = useState('');
 
   // Define backend connection endpoint.
-  // In production, fallback to local origin since we serve the frontend bundle.
+  // In production, connect directly to the deployed Render backend API.
   const backendUrl = import.meta.env.PROD 
-    ? (import.meta.env.VITE_API_URL || window.location.origin) 
+    ? (import.meta.env.VITE_API_URL || 'https://firstcry-sentiment-dashboard.onrender.com') 
     : 'http://localhost:5001';
 
   const handleLoginSuccess = (userData, userToken) => {
