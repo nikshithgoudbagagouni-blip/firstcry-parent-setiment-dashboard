@@ -1,11 +1,10 @@
 services:
   - type: web
-    name: firstcry-backend
+    name: firstcry-sentiment-dashboard
     env: node
     plan: free
     autoDeploy: true
-    rootDir: backend
-    buildCommand: npm install
+    buildCommand: npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -15,18 +14,3 @@ services:
       - key: PORT
         value: "10000"
     healthCheckPath: /api/status
-
-  - type: static
-    name: firstcry-frontend
-    env: static
-    plan: free
-    autoDeploy: true
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    publishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: firstcry-backend
-          property: host
