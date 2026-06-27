@@ -16,8 +16,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static assets if in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+const fs = require('fs');
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+if (process.env.NODE_ENV === 'production' && fs.existsSync(frontendDistPath)) {
+  app.use(express.static(frontendDistPath));
 }
 
 // Connect to Database (MongoDB)
@@ -68,10 +70,10 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Catch-all route to serve the React SPA frontend in production
-if (process.env.NODE_ENV === 'production') {
+// Catch-all route to serve the React SPA frontend in production if it exists
+if (process.env.NODE_ENV === 'production' && fs.existsSync(frontendDistPath)) {
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
   });
 } else {
   app.get('/', (req, res) => {
