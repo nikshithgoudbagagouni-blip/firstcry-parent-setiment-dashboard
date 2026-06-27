@@ -15,10 +15,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static assets if in production
+// Serve static assets if they exist
 const fs = require('fs');
 const frontendDistPath = path.join(__dirname, '../frontend/dist');
-if (process.env.NODE_ENV === 'production' && fs.existsSync(frontendDistPath)) {
+if (fs.existsSync(frontendDistPath)) {
   app.use(express.static(frontendDistPath));
 }
 
@@ -79,8 +79,8 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Catch-all route to serve the React SPA frontend in production if it exists
-if (process.env.NODE_ENV === 'production' && fs.existsSync(frontendDistPath)) {
+// Catch-all route to serve the React SPA frontend if it exists
+if (fs.existsSync(frontendDistPath)) {
   app.get('*', (req, res) => {
     res.sendFile(path.join(frontendDistPath, 'index.html'));
   });
