@@ -20,7 +20,7 @@ export default function App() {
   // Define backend connection endpoint.
   // In production, fallback to local origin since we serve the frontend bundle.
   const backendUrl = import.meta.env.PROD 
-    ? window.location.origin 
+    ? (import.meta.env.VITE_API_URL || window.location.origin) 
     : 'http://localhost:5001';
 
   const handleLoginSuccess = (userData, userToken) => {
