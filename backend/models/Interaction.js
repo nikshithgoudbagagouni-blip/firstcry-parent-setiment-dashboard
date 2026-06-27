@@ -69,12 +69,13 @@ function mapRow(row) {
   };
 }
 
-// Thenable query chain to mimic Mongoose find().populate().sort()
+// Thenable query chain to mimic Mongoose find().populate().sort().limit()
 function createQueryChain(queryParams) {
   return {
     params: queryParams,
     populateList: [],
     sortObj: null,
+    limitVal: null,
     populate: function(field) {
       this.populateList.push(field);
       return this;
@@ -83,12 +84,17 @@ function createQueryChain(queryParams) {
       this.sortObj = sortOpts;
       return this;
     },
+    limit: function(val) {
+      this.limitVal = val;
+      return this;
+    },
     then: async function(resolve, reject) {
       try {
         if (db.getDbType() !== 'postgres') {
           let mq = MongoInteraction.find(this.params);
           this.populateList.forEach(p => { mq = mq.populate(p); });
           if (this.sortObj) { mq = mq.sort(this.sortObj); }
+          if (this.limitVal) { mq = mq.limit(this.limitVal); }
           const res = await mq;
           return resolve(res);
         }
@@ -111,6 +117,10 @@ function createQueryChain(queryParams) {
         }
         
         sql += ` ORDER BY i.timestamp DESC`;
+
+        if (this.limitVal) {
+          sql += ` LIMIT ${Number(this.limitVal)}`;
+        }
 
         const res = await db.query(sql, values);
         const mapped = res.rows.map(row => {

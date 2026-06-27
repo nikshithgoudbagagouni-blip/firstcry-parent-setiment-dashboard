@@ -142,6 +142,20 @@ async function provisionTables() {
       );
     `);
 
+    // Create analytics_cache table
+    await pgPool.query(`
+      CREATE TABLE IF NOT EXISTS analytics_cache (
+        id SERIAL PRIMARY KEY,
+        class_grade VARCHAR(100) NOT NULL DEFAULT 'school-wide',
+        date DATE NOT NULL DEFAULT CURRENT_DATE,
+        avg_sentiment_score DECIMAL(5, 2) NOT NULL DEFAULT 0,
+        avg_engagement_index INT NOT NULL DEFAULT 0,
+        active_alerts_count INT NOT NULL DEFAULT 0,
+        key_concerns JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     console.log('✨ PostgreSQL tables verified/provisioned successfully!');
   } catch (error) {
     console.error('❌ Failed to provision PostgreSQL tables:', error.message);
