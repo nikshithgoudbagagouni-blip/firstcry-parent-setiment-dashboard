@@ -3,6 +3,7 @@ services:
     name: firstcry-backend
     env: node
     plan: free
+    autoDeploy: true
     rootDir: backend
     buildCommand: npm install
     startCommand: npm start
@@ -19,6 +20,7 @@ services:
     name: firstcry-frontend
     env: static
     plan: free
+    autoDeploy: true
     rootDir: frontend
     buildCommand: npm install && npm run build
     publishPath: dist
