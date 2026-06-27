@@ -70,12 +70,20 @@ app.get('/api/status', (req, res) => {
       dbStatus = 'Connected (MongoDB)';
     }
   }
+  const fs = require('fs');
+  let parentContents = [];
+  try {
+    parentContents = fs.readdirSync(path.join(__dirname, '..'));
+  } catch (err) {
+    parentContents = [err.message];
+  }
   res.status(200).json({
     status: 'Online',
     timestamp: new Date(),
     environment: process.env.NODE_ENV || 'development',
     database: dbStatus,
-    version: "v3-postgres-limit-fix"
+    version: "v4-debug-paths",
+    parentContents
   });
 });
 
