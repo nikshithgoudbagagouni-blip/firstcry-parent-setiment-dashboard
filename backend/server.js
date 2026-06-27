@@ -74,7 +74,8 @@ app.get('/api/status', (req, res) => {
     status: 'Online',
     timestamp: new Date(),
     environment: process.env.NODE_ENV || 'development',
-    database: dbStatus
+    database: dbStatus,
+    version: "v3-postgres-limit-fix"
   });
 });
 
