@@ -61,12 +61,20 @@ app.use('/api/notices', require('./routes/notice'));
 
 // Root Status Endpoint
 app.get('/api/status', (req, res) => {
-  const mongoose = require('mongoose');
+  const { getIsConnected, getDbType } = require('./config/db');
+  let dbStatus = 'Fallback Mode (Local mockStore JSON)';
+  if (getIsConnected()) {
+    if (getDbType() === 'postgres') {
+      dbStatus = 'Connected (Supabase PostgreSQL)';
+    } else if (getDbType() === 'mongodb') {
+      dbStatus = 'Connected (MongoDB)';
+    }
+  }
   res.status(200).json({
     status: 'Online',
     timestamp: new Date(),
     environment: process.env.NODE_ENV || 'development',
-    database: mongoose.connection.readyState === 1 ? 'Connected (MongoDB)' : 'Fallback Mode (Local mockStore JSON)'
+    database: dbStatus
   });
 });
 
