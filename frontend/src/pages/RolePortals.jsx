@@ -575,7 +575,10 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl 
       }
     } catch (err) {
       console.error('Error fetching parent student data:', err);
-      setError('Failed to connect to the database. Please check your backend connection.');
+      const details = err.response
+        ? `Server Error (${err.response.status}): ${typeof err.response.data === 'string' ? err.response.data : JSON.stringify(err.response.data)}`
+        : err.message;
+      setError(`Failed to connect to database: ${details}`);
     } finally {
       setLoading(false);
     }
