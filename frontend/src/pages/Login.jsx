@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { GraduationCap, Lock, Mail, Loader2, AlertCircle, ShieldCheck, Users, Heart, ArrowRight } from 'lucide-react';
+import { GraduationCap, Lock, Mail, Loader2, AlertCircle, ShieldCheck, Users, Heart, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const accounts = {
   admin: { label: 'Admin portal', email: 'admin@firstcry.com', password: 'admin', icon: ShieldCheck, note: 'Center analytics & operations' },
@@ -14,6 +14,20 @@ export default function Login({ onLoginSuccess, backendUrl }) {
   const [password, setPassword] = useState(accounts.admin.password);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [backendStatus, setBackendStatus] = useState('checking'); // 'checking', 'online', 'offline'
+  const [databaseStatus, setDatabaseStatus] = useState('');
+
+  useEffect(() => {
+    axios.get(`${backendUrl}/api/status`)
+      .then(res => {
+        setBackendStatus('online');
+        setDatabaseStatus(res.data.database || 'Connected');
+      })
+      .catch(err => {
+        setBackendStatus('offline');
+        console.error('Backend status check failed:', err);
+      });
+  }, [backendUrl]);
 
   const chooseRole = (nextRole) => {
     setRole(nextRole);
@@ -30,7 +44,11 @@ export default function Login({ onLoginSuccess, backendUrl }) {
       const response = await axios.post(`${backendUrl}/api/auth/login`, { email, password });
       onLoginSuccess(response.data.user, response.data.token);
     } catch (err) {
-      setError(err.response?.data?.error || 'Unable to sign in. Please check the selected demo account.');
+      if (!err.response) {
+        setError(`Backend connection error: ${err.message}. Please verify that the backend server is running on port 5001.`);
+      } else {
+        setError(err.response?.data?.error || 'Unable to sign in. Please check the selected demo account.');
+      }
     } finally {
       setLoading(false);
     }
@@ -72,10 +90,45 @@ export default function Login({ onLoginSuccess, backendUrl }) {
           </div>
 
           <form onSubmit={handleSubmit} className="bg-white border border-[#e4e8f0] rounded-3xl p-6 shadow-[0_18px_50px_rgba(34,52,84,.08)] space-y-5">
+            {backendStatus === 'offline' && (
+              <div className="flex items-start gap-2.5 p-3.5 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 text-xs">
+                <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600"/>
+                <div>
+                  <p className="font-bold text-rose-800">Backend Server Offline</p>
+                  <p className="text-rose-600/90 mt-0.5 leading-relaxed">
+                    The frontend cannot connect to the backend at <code>{backendUrl || 'relative proxy (port 5001)'}</code>. 
+                    Please make sure you started the project with <code>npm run dev</code> from the root folder.
+                  </p>
+                </div>
+              </div>
+            )}
             {error && <div className="flex gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-700 text-xs"><AlertCircle size={16}/>{error}</div>}
             <div><label className="form-label" htmlFor="email">Email address</label><div className="relative"><Mail className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} className="form-input pl-11" required/></div></div>
             <div><div className="flex justify-between"><label className="form-label" htmlFor="password">Password</label><span className="text-[10px] text-[#155eef] font-bold">Demo credentials filled</span></div><div className="relative"><Lock className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="form-input pl-11" required/></div></div>
-            <button disabled={loading} className="w-full btn-primary py-3.5">{loading ? <><Loader2 size={17} className="animate-spin"/>Signing in...</> : <>Enter {accounts[role].label}<ArrowRight size={17}/></>}</button>
+            <button disabled={loading || backendStatus === 'offline'} className="w-full btn-primary py-3.5">{loading ? <><Loader2 size={17} className="animate-spin"/>Signing in...</> : <>Enter {accounts[role].label}<ArrowRight size={17}/></>}</button>
+            
+            <div className="pt-2 border-t border-gray-100 flex items-center justify-center gap-1.5 text-[10px] font-medium text-[#7b8499]">
+              {backendStatus === 'checking' && (
+                <>
+                  <Loader2 size={10} className="animate-spin text-blue-500" />
+                  Checking backend connection...
+                </>
+              )}
+              {backendStatus === 'online' && (
+                <>
+                  <CheckCircle2 size={11} className="text-emerald-500" />
+                  <span className="text-emerald-600">Backend Online</span>
+                  <span className="text-gray-300">|</span>
+                  <span>{databaseStatus}</span>
+                </>
+              )}
+              {backendStatus === 'offline' && (
+                <>
+                  <AlertCircle size={11} className="text-rose-500" />
+                  <span className="text-rose-600 font-bold">Backend Offline (Port 5001)</span>
+                </>
+              )}
+            </div>
           </form>
         </div>
       </section>
