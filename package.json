@@ -13,6 +13,9 @@
   "dependencies": {
     "concurrently": "^8.2.2"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "author": "Antigravity",
   "license": "MIT"
 }
