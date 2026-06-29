@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const { getIsConnected } = require('../config/db');
 const { readStore } = require('../services/userService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'firstcry-development-secret-change-before-production';
@@ -7,7 +9,7 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET is required in production.');
 }
 
-function authenticate(req, res, next) {
+async function authenticate(req, res, next) {
   const header = req.headers.authorization || '';
   const [scheme, token] = header.split(' ');
   if (scheme !== 'Bearer' || !token) {
@@ -20,6 +22,19 @@ function authenticate(req, res, next) {
       issuer: 'firstcry-intellitots',
       audience: 'firstcry-portals'
     });
+
+    let userObj = null;
+    if (getIsConnected()) {
+      userObj = await User.findById(req.user.sub);
+    } else {
+      userObj = readStore().users.find(u => u.id === req.user.sub);
+    }
+
+    if (!userObj || userObj.status === 'disabled') {
+      return res.status(401).json({ error: 'Account suspended or unavailable.' });
+    }
+
+    req.currentUser = userObj;
     return next();
   } catch (_error) {
     return res.status(401).json({ error: 'Session expired or invalid.' });

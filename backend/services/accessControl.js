@@ -1,8 +1,5 @@
-const { readStore } = require('./userService');
-
 function currentAccount(req) {
-  if (!req.user?.sub) return null;
-  return readStore().users.find(user => user.id === req.user.sub && user.status === 'active') || null;
+  return req.currentUser || null;
 }
 
 function normalizeId(value) {

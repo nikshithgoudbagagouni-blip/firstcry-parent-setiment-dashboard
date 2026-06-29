@@ -130,16 +130,52 @@ async function provisionTables() {
       ALTER TABLE meetings ADD COLUMN IF NOT EXISTS meeting_notes TEXT DEFAULT '';
     `);
 
+    // Migrate id column if it was previously SERIAL (integer)
+    await pgPool.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1 
+          FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'id' AND data_type = 'integer'
+        ) THEN
+          DROP TABLE IF EXISTS users CASCADE;
+        END IF;
+      END $$;
+    `);
+
     // Create users table
     await pgPool.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
+        id VARCHAR(100) PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
         role VARCHAR(50) DEFAULT 'admin',
+        phone VARCHAR(50),
+        assigned_class VARCHAR(100),
+        assigned_student_ids JSONB,
+        status VARCHAR(50) DEFAULT 'active',
+        last_login TIMESTAMP,
+        avatar VARCHAR(255),
+        login_history JSONB,
+        activity_logs JSONB,
+        parent_id VARCHAR(100),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `);
+
+    // Ensure all columns exist for existing users tables
+    await pgPool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS assigned_class VARCHAR(100);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS assigned_student_ids JSONB;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'active';
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMP;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar VARCHAR(255);
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS login_history JSONB;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS activity_logs JSONB;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS parent_id VARCHAR(100);
     `);
 
     // Create analytics_cache table

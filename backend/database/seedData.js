@@ -32,8 +32,26 @@ async function seed() {
         // 2. Seed Users
         for (const u of seedSource.users) {
           await db.query(
-            `INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)`,
-            [u.name, u.email, u.password, u.role]
+            `INSERT INTO users (id, name, email, password, role, phone, assigned_class, 
+             assigned_student_ids, status, last_login, avatar, login_history, activity_logs, parent_id, created_at) 
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+            [
+              u.id,
+              u.name,
+              u.email,
+              u.password,
+              u.role,
+              u.phone || '',
+              u.assignedClass || '',
+              JSON.stringify(u.assignedStudentIds || []),
+              u.status || 'active',
+              u.lastLogin ? new Date(u.lastLogin) : null,
+              u.avatar || '',
+              JSON.stringify(u.loginHistory || []),
+              JSON.stringify(u.activityLogs || []),
+              u.parentId || '',
+              u.createdAt ? new Date(u.createdAt) : new Date()
+            ]
           );
         }
         console.log(`👤 Seeded ${seedSource.users.length} users.`);
@@ -152,10 +170,21 @@ async function seed() {
 
         // Seed Users
         const createdUsers = await User.insertMany(seedSource.users.map(u => ({
+          id: u.id,
           name: u.name,
           email: u.email,
           password: u.password,
-          role: u.role
+          role: u.role,
+          phone: u.phone,
+          assignedClass: u.assignedClass,
+          assignedStudentIds: u.assignedStudentIds,
+          status: u.status,
+          lastLogin: u.lastLogin,
+          avatar: u.avatar,
+          loginHistory: u.loginHistory,
+          activityLogs: u.activityLogs,
+          parentId: u.parentId,
+          createdAt: u.createdAt
         })));
         console.log(`👤 Seeded ${createdUsers.length} system users.`);
 

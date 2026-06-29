@@ -39,11 +39,19 @@ function mapRow(row) {
 const ChildWrapper = {
   findOne: async function(query) {
     if (db.getDbType() === 'postgres') {
-      const res = await db.query(
-        `SELECT * FROM children WHERE parent_id = $1 AND LOWER(name) = LOWER($2) LIMIT 1`,
-        [query.parentId, query.name]
-      );
-      return mapRow(res.rows[0]);
+      if (query.parentId && query.name) {
+        const res = await db.query(
+          `SELECT * FROM children WHERE parent_id = $1 AND LOWER(name) = LOWER($2) LIMIT 1`,
+          [query.parentId, query.name]
+        );
+        return mapRow(res.rows[0]);
+      } else if (query.parentId) {
+        const res = await db.query(
+          `SELECT * FROM children WHERE parent_id = $1 LIMIT 1`,
+          [query.parentId]
+        );
+        return mapRow(res.rows[0]);
+      }
     }
     return MongoChild.findOne(query);
   },
