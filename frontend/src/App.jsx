@@ -81,7 +81,7 @@ export default function App() {
     if (stored && stored !== 'undefined' && stored !== 'null' && stored.trim() !== '') {
       return stored;
     }
-    return import.meta.env.VITE_API_URL || 'https://firstcry-parent-setiment-dashboard.onrender.com';
+    return import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://firstcry-parent-setiment-dashboard.onrender.com');
   });
 
   const handleLoginSuccess = (userData, userToken) => {
@@ -266,3 +266,4 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+

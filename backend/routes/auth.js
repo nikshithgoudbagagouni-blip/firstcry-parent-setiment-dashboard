@@ -6,7 +6,14 @@ const User = require('../models/User');
 const { getIsConnected } = require('../config/db');
 
 const router = express.Router();
-const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many sign-in attempts. Please try again later.' } });
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: Number(process.env.LOGIN_RATE_LIMIT || 25),
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { error: 'Too many sign-in attempts. Please try again later.' }
+});
 
 router.post('/login', loginLimiter, async (req, res) => {
   let email = String(req.body.email || '').trim().toLowerCase();
@@ -78,3 +85,4 @@ router.post('/logout', authenticate, async (req, res) => {
 });
 
 module.exports = router;
+
