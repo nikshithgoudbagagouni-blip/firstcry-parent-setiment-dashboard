@@ -29,8 +29,21 @@ async function seed() {
         await db.query(`TRUNCATE TABLE parents, children, interactions, meetings, users, analytics_cache CASCADE;`);
         console.log('🗑️  Truncated existing SQL tables.');
 
-        // 2. Seed Users
+        // 2. Seed Parents
+        const parentMap = {};
+        for (const p of seedSource.parents) {
+          const res = await db.query(
+            `INSERT INTO parents (name, email, phone, student_name, student_id, class_grade, admission_status, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+            [p.name, p.email, p.phone, p.studentName, p.studentId, p.classGrade, p.admissionStatus, new Date(p.createdAt)]
+          );
+          parentMap[p.id] = res.rows[0].id;
+        }
+        console.log(`👪 Seeded ${Object.keys(parentMap).length} parents.`);
+
+        // 3. Seed Users
         for (const u of seedSource.users) {
+          const mappedParentId = u.parentId && parentMap[u.parentId] ? String(parentMap[u.parentId]) : '';
           await db.query(
             `INSERT INTO users (id, name, email, password, role, phone, assigned_class, 
              assigned_student_ids, status, last_login, avatar, login_history, activity_logs, parent_id, created_at) 
@@ -49,24 +62,12 @@ async function seed() {
               u.avatar || '',
               JSON.stringify(u.loginHistory || []),
               JSON.stringify(u.activityLogs || []),
-              u.parentId || '',
+              mappedParentId,
               u.createdAt ? new Date(u.createdAt) : new Date()
             ]
           );
         }
         console.log(`👤 Seeded ${seedSource.users.length} users.`);
-
-        // 3. Seed Parents
-        const parentMap = {};
-        for (const p of seedSource.parents) {
-          const res = await db.query(
-            `INSERT INTO parents (name, email, phone, student_name, student_id, class_grade, admission_status, created_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-            [p.name, p.email, p.phone, p.studentName, p.studentId, p.classGrade, p.admissionStatus, new Date(p.createdAt)]
-          );
-          parentMap[p.id] = res.rows[0].id;
-        }
-        console.log(`👪 Seeded ${Object.keys(parentMap).length} parents.`);
 
         // 4. Seed Children
         const childMap = {};
@@ -168,26 +169,6 @@ async function seed() {
         
         console.log('🗑️  Cleared existing MongoDB collections.');
 
-        // Seed Users
-        const createdUsers = await User.insertMany(seedSource.users.map(u => ({
-          id: u.id,
-          name: u.name,
-          email: u.email,
-          password: u.password,
-          role: u.role,
-          phone: u.phone,
-          assignedClass: u.assignedClass,
-          assignedStudentIds: u.assignedStudentIds,
-          status: u.status,
-          lastLogin: u.lastLogin,
-          avatar: u.avatar,
-          loginHistory: u.loginHistory,
-          activityLogs: u.activityLogs,
-          parentId: u.parentId,
-          createdAt: u.createdAt
-        })));
-        console.log(`👤 Seeded ${createdUsers.length} system users.`);
-
         // Seed Parents
         const parentMap = {};
         for (const p of seedSource.parents) {
@@ -204,6 +185,29 @@ async function seed() {
           parentMap[p.id] = parentDoc._id;
         }
         console.log(`👪 Seeded ${Object.keys(parentMap).length} parents.`);
+
+        // Seed Users
+        const createdUsers = await User.insertMany(seedSource.users.map(u => {
+          const mappedParentId = u.parentId && parentMap[u.parentId] ? String(parentMap[u.parentId]) : '';
+          return {
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            password: u.password,
+            role: u.role,
+            phone: u.phone,
+            assignedClass: u.assignedClass,
+            assignedStudentIds: u.assignedStudentIds,
+            status: u.status,
+            lastLogin: u.lastLogin,
+            avatar: u.avatar,
+            loginHistory: u.loginHistory,
+            activityLogs: u.activityLogs,
+            parentId: mappedParentId,
+            createdAt: u.createdAt
+          };
+        }));
+        console.log(`👤 Seeded ${createdUsers.length} system users.`);
 
         // Seed Children
         const childMap = {};
