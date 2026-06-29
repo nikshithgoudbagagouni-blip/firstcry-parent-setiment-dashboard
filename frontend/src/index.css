@@ -3,13 +3,7 @@
 @import "tailwindcss";
 
 @layer base {
-  body {
-    @apply bg-[#FAF7F2] text-[#4A433A] font-sans antialiased overflow-x-hidden;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(255, 133, 98, 0.08) 0px, transparent 40%),
-      radial-gradient(at 100% 100%, rgba(136, 176, 151, 0.08) 0px, transparent 40%);
-    background-attachment: fixed;
-  }
+  body { @apply bg-[#f6f7fb] text-[#172033] font-sans antialiased overflow-x-hidden; }
 }
 
 /* Custom Scrollbar */
@@ -30,7 +24,7 @@
 
 /* Custom Utilities - LittleBloom Academy Aesthetic */
 .glass-panel {
-  @apply bg-white/95 backdrop-blur-md border border-[#E6DDD0] rounded-[24px] shadow-[0_12px_40px_-15px_rgba(74,67,58,0.06)] transition-all duration-300;
+  @apply bg-white border border-[#e5e9f2] rounded-[22px] shadow-[0_10px_32px_-16px_rgba(31,52,91,0.16)] transition-all duration-300;
 }
 
 .glass-panel-hover {
@@ -38,7 +32,7 @@
 }
 
 .btn-primary {
-  @apply px-5 py-3 bg-[#FF8562] hover:bg-[#FF744F] text-white font-semibold rounded-2xl shadow-md shadow-[#FF8562]/10 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer;
+  @apply px-5 py-3 bg-[#155eef] hover:bg-[#0f4fd2] text-white font-semibold rounded-xl shadow-md shadow-blue-500/15 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer;
 }
 
 .btn-secondary {
@@ -46,7 +40,7 @@
 }
 
 .form-input {
-  @apply w-full px-4 py-3 bg-[#FCFAF7] border border-[#E6DDD0] rounded-2xl focus:outline-none focus:border-[#FF8562] focus:ring-2 focus:ring-[#FF8562]/10 text-[#4A433A] placeholder-[#9E9588] transition-all duration-200;
+  @apply w-full px-4 py-3 bg-[#fbfcfe] border border-[#dfe4ed] rounded-xl focus:outline-none focus:border-[#155eef] focus:ring-2 focus:ring-[#155eef]/10 text-[#172033] placeholder-[#929bad] transition-all duration-200;
 }
 
 /* Ensure inputs with absolute-positioned icons have correct left padding */
@@ -56,8 +50,18 @@
 }
 
 .form-label {
-  @apply block text-xs font-bold text-[#6B6152] uppercase tracking-wider mb-2;
+  @apply block text-xs font-bold text-[#606b82] uppercase tracking-wider mb-2;
 }
+
+.portal-card { @apply bg-white border border-[#e5e9f2] rounded-[22px] shadow-[0_10px_30px_-18px_rgba(31,52,91,0.2)]; }
+.icon-button { @apply h-10 w-10 rounded-xl bg-white border border-[#e3e7ef] flex items-center justify-center text-[#667188] hover:text-[#155eef] hover:border-[#b9c9e8] transition; }
+.chat-bubble { @apply w-fit max-w-[78%] px-4 py-3 rounded-2xl rounded-tl-sm bg-white border border-[#e5e9f2] text-xs text-[#59647b] shadow-sm; }
+.chat-bubble.own { @apply ml-auto bg-[#155eef] text-white border-[#155eef] rounded-tl-2xl rounded-tr-sm; }
+.role-pill { @apply inline-flex px-2.5 py-1 rounded-full text-[10px] font-extrabold capitalize; }
+.role-pill.teacher { @apply bg-violet-50 text-violet-700; }
+.role-pill.parent { @apply bg-blue-50 text-blue-700; }
+.bulk-btn { @apply px-3 py-1.5 rounded-lg bg-white border border-[#cad8f5] text-[#155eef] text-[10px] font-bold flex items-center gap-1.5; }
+.page-btn { @apply h-8 w-8 rounded-lg border border-[#dfe4ed] flex items-center justify-center text-[#606b80] disabled:opacity-30 disabled:cursor-not-allowed hover:border-[#155eef] hover:text-[#155eef]; }
 
 /* Status Badges */
 .badge-positive {
@@ -88,7 +92,6 @@
 
 /* Typography and Contrast Overrides for Bright Mode */
 h1, h2, h3, h4, 
-.text-white, 
 .text-slate-100, 
 .text-slate-200, 
 .text-slate-105 {
@@ -107,6 +110,13 @@ h1, h2, h3, h4,
 .btn-primary,
 .btn-primary * {
   color: #FFFFFF !important;
+}
+
+@media (max-width: 900px) {
+  aside { width: 5rem !important; }
+  aside nav span, aside h1, aside p, aside button span { display: none; }
+  aside nav button { justify-content: center; padding-left: .75rem; padding-right: .75rem; }
+  aside > div:first-child > div { justify-content: center; padding-left: .75rem; padding-right: .75rem; }
 }
 
 /* Secondary button text colors */

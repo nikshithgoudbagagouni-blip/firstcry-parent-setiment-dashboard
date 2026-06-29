@@ -1,0 +1,48 @@
+const express = require('express');
+const rateLimit = require('express-rate-limit');
+const { authenticate, signUser } = require('../middleware/auth');
+const { readStore, writeStore, publicUser, verifyPassword, hashPassword } = require('../services/userService');
+
+const router = express.Router();
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many sign-in attempts. Please try again later.' } });
+
+router.post('/login', loginLimiter, async (req, res) => {
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const password = String(req.body.password || '');
+  if (!email || !password || password.length > 128) return res.status(400).json({ error: 'Email and password are required.' });
+
+  const data = readStore();
+  const user = data.users.find(item => item.email.toLowerCase() === email);
+  if (!user || !(await verifyPassword(user, password))) return res.status(401).json({ error: 'Invalid email or password.' });
+  if (user.status !== 'active') return res.status(403).json({ error: 'This account is disabled. Contact the administrator.' });
+
+  const now = new Date().toISOString();
+  const forwarded = req.headers['x-forwarded-for'];
+  const ipAddress = String(Array.isArray(forwarded) ? forwarded[0] : forwarded || req.ip || '').split(',')[0].trim();
+  user.lastLogin = now;
+  user.loginHistory = [{ timestamp: now, ipAddress, userAgent: req.get('user-agent') || 'Unknown', result: 'Success' }, ...(user.loginHistory || [])].slice(0, 30);
+  user.activityLogs = [{ timestamp: now, action: 'Signed in', actor: user.name }, ...(user.activityLogs || [])].slice(0, 50);
+  if (!user.password.startsWith('$2')) user.password = await hashPassword(password);
+  writeStore(data);
+
+  return res.json({ token: signUser(user), user: publicUser(user) });
+});
+
+router.get('/me', authenticate, (req, res) => {
+  const data = readStore();
+  const user = data.users.find(item => item.id === req.user.sub);
+  if (!user || user.status !== 'active') return res.status(401).json({ error: 'Account unavailable.' });
+  return res.json({ user: publicUser(user) });
+});
+
+router.post('/logout', authenticate, (req, res) => {
+  const data = readStore();
+  const user = data.users.find(item => item.id === req.user.sub);
+  if (user) {
+    user.activityLogs = [{ timestamp: new Date().toISOString(), action: 'Signed out', actor: user.name }, ...(user.activityLogs || [])].slice(0, 50);
+    writeStore(data);
+  }
+  return res.status(204).end();
+});
+
+module.exports = router;

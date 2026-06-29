@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import axios from 'axios';
 import Sidebar from './components/Sidebar';
+import HeaderTools from './components/HeaderTools';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import FeedbackForm from './pages/FeedbackForm';
@@ -9,33 +11,96 @@ import CommunicationHistory from './pages/CommunicationHistory';
 import NoticeGenerator from './pages/NoticeGenerator';
 import Reports from './pages/Reports';
 import FeedbackDetail from './pages/FeedbackDetail';
+import { TeacherPortal, ParentPortal } from './pages/RolePortals';
+import UserManagement from './pages/UserManagement';
+
+const savedSession = (() => {
+  try { return JSON.parse(localStorage.getItem('firstcry-session')) || {}; }
+  catch { return {}; }
+})();
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(savedSession.token && savedSession.user));
+  const [user, setUser] = useState(savedSession.user || null);
+  const [token, setToken] = useState(savedSession.token || '');
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedParentId, setSelectedParentId] = useState('');
 
   // Define backend connection endpoint.
-  const backendUrl = import.meta.env.VITE_API_URL || 'https://firstcry-sentiment-dashboard.onrender.com';
+  const backendUrl = import.meta.env.VITE_API_URL || '';
 
   const handleLoginSuccess = (userData, userToken) => {
     setUser(userData);
     setToken(userToken);
+    axios.defaults.headers.common.Authorization = `Bearer ${userToken}`;
+    localStorage.setItem('firstcry-session', JSON.stringify({ token: userToken, user: userData }));
     setIsAuthenticated(true);
     setCurrentPage('dashboard');
   };
 
-  const handleLogout = () => {
+  const handleLogout = useCallback((notifyServer = true) => {
+    if (notifyServer && token) axios.post(`${backendUrl}/api/auth/logout`).catch(() => {});
     setIsAuthenticated(false);
     setUser(null);
     setToken('');
     setCurrentPage('dashboard');
     setSelectedParentId('');
+    delete axios.defaults.headers.common.Authorization;
+    localStorage.removeItem('firstcry-session');
+  }, [backendUrl, token]);
+
+  const handleSwitchRole = async (role) => {
+    let email = 'admin@firstcry.com';
+    let password = 'admin';
+    if (role === 'teacher') {
+      email = 'priya@firstcry.com';
+      password = 'teacher';
+    } else if (role === 'parent') {
+      email = 'rahul.sharma@example.com';
+      password = 'parent';
+    }
+    
+    try {
+      const response = await axios.post(`${backendUrl}/api/auth/login`, { email, password });
+      handleLoginSuccess(response.data.user, response.data.token);
+    } catch (err) {
+      console.error('Failed to switch role:', err);
+      alert('Failed to automatically switch portal role. Please try manually.');
+    }
   };
 
+  useEffect(() => {
+    if (!token) return;
+    axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+    axios.get(`${backendUrl}/api/auth/me`).then(({ data }) => {
+      setUser(data.user);
+      localStorage.setItem('firstcry-session', JSON.stringify({ token, user: data.user }));
+    }).catch(() => handleLogout(false));
+  }, [token, backendUrl, handleLogout]);
+
   const renderPage = () => {
+    if (user?.role === 'teacher') {
+      return (
+        <TeacherPortal 
+          page={currentPage} 
+          setCurrentPage={setCurrentPage} 
+          user={user} 
+          onLogout={handleLogout} 
+        />
+      );
+    }
+
+    if (user?.role === 'parent') {
+      return (
+        <ParentPortal 
+          page={currentPage} 
+          setCurrentPage={setCurrentPage} 
+          user={user} 
+          onLogout={handleLogout} 
+        />
+      );
+    }
+
     switch (currentPage) {
       case 'dashboard':
         return (
@@ -45,6 +110,8 @@ export default function App() {
             backendUrl={backendUrl} 
           />
         );
+      case 'user-management':
+        return <UserManagement backendUrl={backendUrl} />;
       case 'feedback-form':
         return <FeedbackForm backendUrl={backendUrl} />;
       case 'meeting-scheduler':
@@ -96,7 +163,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex bg-darkBg text-[#4A433A] overflow-x-hidden">
+    <div className="min-h-screen flex bg-[#f6f7fb] text-[#172033] overflow-x-hidden">
       
       {/* Sidebar Navigation */}
       <Sidebar 
@@ -110,10 +177,16 @@ export default function App() {
         }} 
         onLogout={handleLogout}
         user={user}
+        onSwitchRole={handleSwitchRole}
       />
 
       {/* Main Content Area Panel */}
       <main className="flex-1 flex flex-col overflow-y-auto">
+        {user?.role === 'admin' && (
+          <div className="w-full max-w-7xl mx-auto px-8 pt-6 flex justify-end">
+            <HeaderTools user={user} onLogout={handleLogout} setCurrentPage={setCurrentPage} />
+          </div>
+        )}
         <div className="flex-grow pb-12">
           {renderPage()}
         </div>

@@ -4,15 +4,498 @@
       "id": "u1",
       "name": "Center Head Administrator",
       "email": "admin@firstcry.com",
-      "password": "admin",
-      "role": "admin"
+      "password": "$2b$12$dokdOcUVag75u7v91nnXReJUj5L.LYliTSnliFcxTWpsmoGMRazwq",
+      "role": "admin",
+      "phone": "",
+      "assignedClass": "—",
+      "assignedStudentIds": [],
+      "status": "active",
+      "lastLogin": "2026-06-28T14:30:34.242Z",
+      "createdAt": "2026-06-28T08:31:43.519Z",
+      "avatar": "",
+      "loginHistory": [
+        {
+          "timestamp": "2026-06-28T14:30:34.242Z",
+          "ipAddress": "::1",
+          "userAgent": "Unknown",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:20:04.402Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:20:01.403Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:36.112Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:34.456Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:04:03.730Z",
+          "ipAddress": "::1",
+          "userAgent": "Unknown",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:03:20.932Z",
+          "ipAddress": "::1",
+          "userAgent": "Unknown",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T13:37:30.961Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T13:26:46.164Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T09:12:34.775Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T08:31:43.520Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT; Windows NT 10.0; en-IN) WindowsPowerShell/5.1.26100.8655",
+          "result": "Success"
+        }
+      ],
+      "activityLogs": [
+        {
+          "timestamp": "2026-06-28T14:30:34.242Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T14:20:04.402Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T14:20:01.403Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:36.112Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:34.456Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T14:06:53.776Z",
+          "action": "Signed out",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T14:04:03.730Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T14:03:20.932Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T13:37:30.961Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T13:28:50.596Z",
+          "action": "Signed out",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T13:26:46.164Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T09:27:48.647Z",
+          "action": "Signed out",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T09:12:34.775Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        },
+        {
+          "timestamp": "2026-06-28T08:31:43.520Z",
+          "action": "Signed in",
+          "actor": "Center Head Administrator"
+        }
+      ]
     },
     {
       "id": "u2",
       "name": "Class Teacher Priya",
       "email": "priya@firstcry.com",
+      "password": "$2b$12$77g3UplVhOHB1szi/REQSuR/F9e5kPH8u/NZXpiw6VEKnpjZ9FBdi",
+      "role": "teacher",
+      "phone": "",
+      "assignedClass": "Nursery B",
+      "assignedStudentIds": [],
+      "status": "active",
+      "lastLogin": "2026-06-28T14:20:13.352Z",
+      "createdAt": "2026-06-28T08:31:43.519Z",
+      "avatar": "",
+      "loginHistory": [
+        {
+          "timestamp": "2026-06-28T14:20:13.352Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:59.061Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:57.435Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:42.884Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:10:45.878Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:06:57.584Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T09:27:53.389Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        }
+      ],
+      "activityLogs": [
+        {
+          "timestamp": "2026-06-28T14:20:13.352Z",
+          "action": "Signed in",
+          "actor": "Class Teacher Priya"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:59.061Z",
+          "action": "Signed in",
+          "actor": "Class Teacher Priya"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:57.435Z",
+          "action": "Signed in",
+          "actor": "Class Teacher Priya"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:42.884Z",
+          "action": "Signed in",
+          "actor": "Class Teacher Priya"
+        },
+        {
+          "timestamp": "2026-06-28T14:10:45.878Z",
+          "action": "Signed in",
+          "actor": "Class Teacher Priya"
+        },
+        {
+          "timestamp": "2026-06-28T14:06:57.584Z",
+          "action": "Signed in",
+          "actor": "Class Teacher Priya"
+        },
+        {
+          "timestamp": "2026-06-28T13:11:02.782Z",
+          "action": "Signed out",
+          "actor": "Class Teacher Priya"
+        },
+        {
+          "timestamp": "2026-06-28T09:27:53.389Z",
+          "action": "Signed in",
+          "actor": "Class Teacher Priya"
+        }
+      ]
+    },
+    {
+      "id": "u3",
+      "name": "Class Teacher Meera",
+      "email": "meera.teacher@firstcry.com",
       "password": "teacher",
-      "role": "teacher"
+      "role": "teacher",
+      "phone": "+91 98765 00003",
+      "assignedClass": "Playgroup A",
+      "assignedStudentIds": [],
+      "status": "active",
+      "lastLogin": null,
+      "createdAt": "2026-06-28T08:31:43.519Z",
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
+    },
+    {
+      "id": "up1",
+      "name": "Rahul Sharma",
+      "email": "rahul.sharma@example.com",
+      "password": "$2b$12$g6YteljbLbHhiOxhTgCSfeU7ITJheRmD04bIh0DAIGxy4v3vdVOdK",
+      "phone": "+91 98765 43210",
+      "role": "parent",
+      "parentId": "p1",
+      "assignedClass": "Playgroup A",
+      "assignedStudentIds": [
+        "FC-2026-001"
+      ],
+      "status": "active",
+      "createdAt": "2026-01-10T10:00:00.000Z",
+      "lastLogin": "2026-06-28T14:35:19.434Z",
+      "avatar": "",
+      "loginHistory": [
+        {
+          "timestamp": "2026-06-28T14:35:19.434Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:44.911Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T13:28:54.955Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        },
+        {
+          "timestamp": "2026-06-28T13:11:07.195Z",
+          "ipAddress": "::1",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+          "result": "Success"
+        }
+      ],
+      "activityLogs": [
+        {
+          "timestamp": "2026-06-28T14:35:19.434Z",
+          "action": "Signed in",
+          "actor": "Rahul Sharma"
+        },
+        {
+          "timestamp": "2026-06-28T14:19:44.911Z",
+          "action": "Signed in",
+          "actor": "Rahul Sharma"
+        },
+        {
+          "timestamp": "2026-06-28T13:37:28.408Z",
+          "action": "Signed out",
+          "actor": "Rahul Sharma"
+        },
+        {
+          "timestamp": "2026-06-28T13:28:54.955Z",
+          "action": "Signed in",
+          "actor": "Rahul Sharma"
+        },
+        {
+          "timestamp": "2026-06-28T13:26:39.645Z",
+          "action": "Signed out",
+          "actor": "Rahul Sharma"
+        },
+        {
+          "timestamp": "2026-06-28T13:11:07.195Z",
+          "action": "Signed in",
+          "actor": "Rahul Sharma"
+        }
+      ]
+    },
+    {
+      "id": "up2",
+      "name": "Sneha Reddy",
+      "email": "sneha.reddy@example.com",
+      "password": "Welcome@123",
+      "phone": "+91 91234 56789",
+      "role": "parent",
+      "parentId": "p2",
+      "assignedClass": "Nursery B",
+      "assignedStudentIds": [
+        "FC-2026-002"
+      ],
+      "status": "active",
+      "createdAt": "2026-02-14T11:30:00.000Z",
+      "lastLogin": null,
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
+    },
+    {
+      "id": "up3",
+      "name": "Amit Patel",
+      "email": "amit.patel@example.com",
+      "password": "Welcome@123",
+      "phone": "+91 88888 77777",
+      "role": "parent",
+      "parentId": "p3",
+      "assignedClass": "Toddler C",
+      "assignedStudentIds": [
+        "FC-2026-003"
+      ],
+      "status": "active",
+      "createdAt": "2026-03-01T09:00:00.000Z",
+      "lastLogin": null,
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
+    },
+    {
+      "id": "up4",
+      "name": "Meera Nair",
+      "email": "meera.nair@example.com",
+      "password": "Welcome@123",
+      "phone": "+91 77777 66666",
+      "role": "parent",
+      "parentId": "p4",
+      "assignedClass": "Kindergarten A",
+      "assignedStudentIds": [
+        "FC-2026-004"
+      ],
+      "status": "active",
+      "createdAt": "2026-04-18T14:15:00.000Z",
+      "lastLogin": null,
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
+    },
+    {
+      "id": "up5",
+      "name": "Vikram Malhotra",
+      "email": "vikram.m@example.com",
+      "password": "Welcome@123",
+      "phone": "+91 99999 88888",
+      "role": "parent",
+      "parentId": "p5",
+      "assignedClass": "Nursery B",
+      "assignedStudentIds": [
+        "FC-2026-005"
+      ],
+      "status": "disabled",
+      "createdAt": "2026-01-20T10:00:00.000Z",
+      "lastLogin": null,
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
+    },
+    {
+      "id": "up6",
+      "name": "Anjali Gupta",
+      "email": "anjali.gupta@example.com",
+      "password": "Welcome@123",
+      "phone": "+91 95555 44444",
+      "role": "parent",
+      "parentId": "p6",
+      "assignedClass": "Playgroup A",
+      "assignedStudentIds": [
+        "FC-2026-006"
+      ],
+      "status": "active",
+      "createdAt": "2026-05-02T16:00:00.000Z",
+      "lastLogin": null,
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
+    },
+    {
+      "id": "up7",
+      "name": "Rajesh Kumar",
+      "email": "rajesh.kumar@example.com",
+      "password": "Welcome@123",
+      "phone": "+91 94444 33333",
+      "role": "parent",
+      "parentId": "p7",
+      "assignedClass": "Toddler C",
+      "assignedStudentIds": [
+        "FC-2026-007"
+      ],
+      "status": "active",
+      "createdAt": "2026-06-01T11:00:00.000Z",
+      "lastLogin": null,
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
+    },
+    {
+      "id": "up8",
+      "name": "Pooja Joshi",
+      "email": "pooja.j@example.com",
+      "password": "Welcome@123",
+      "phone": "+91 93333 22222",
+      "role": "parent",
+      "parentId": "p8",
+      "assignedClass": "Kindergarten A",
+      "assignedStudentIds": [
+        "FC-2026-008"
+      ],
+      "status": "active",
+      "createdAt": "2026-02-10T10:00:00.000Z",
+      "lastLogin": null,
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
+    },
+    {
+      "id": "up9",
+      "name": "rahul",
+      "email": "nikshithgoudbagagouni@gmail.com",
+      "password": "Welcome@123",
+      "phone": "9848462542",
+      "role": "parent",
+      "parentId": "p_1782320947826",
+      "assignedClass": "General Playgroup",
+      "assignedStudentIds": [
+        "FC-7826"
+      ],
+      "status": "active",
+      "createdAt": "2026-06-24T17:09:07.826Z",
+      "lastLogin": null,
+      "avatar": "",
+      "loginHistory": [],
+      "activityLogs": []
     }
   ],
   "parents": [

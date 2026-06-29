@@ -5,7 +5,7 @@ const db = require('../config/db');
 const InteractionSchema = new mongoose.Schema({
   parentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Parent', required: true },
   childId: { type: mongoose.Schema.Types.ObjectId, ref: 'Child', default: null },
-  type: { type: String, enum: ['email', 'portal_log', 'survey', 'rsvp', 'meeting_notes'], required: true },
+  type: { type: String, enum: ['email', 'portal_log', 'survey', 'rsvp', 'meeting_notes', 'learning_story'], required: true },
   rawText: { type: String, default: '' },
   normalizedText: { type: String, default: '' },
   sentimentScore: { type: Number, default: 0 },

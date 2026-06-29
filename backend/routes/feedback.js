@@ -8,6 +8,9 @@ router.post('/create', feedbackController.createFeedback);
 // GET /api/feedback/list
 router.get('/list', feedbackController.listFeedback);
 
+// GET /api/feedback/parents
+router.get('/parents', feedbackController.listParents);
+
 // GET /api/feedback/:id
 router.get('/:id', feedbackController.getFeedbackById);
 

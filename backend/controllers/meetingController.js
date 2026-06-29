@@ -2,6 +2,7 @@ const Meeting = require('../models/Meeting');
 const Parent = require('../models/Parent');
 const { getIsConnected } = require('../config/db');
 const mockStore = require('../data/mockStore');
+const { canAccessParent, filterParentsForRequest, forbidden } = require('../services/accessControl');
 
 // Create Meeting
 exports.createMeeting = async (req, res) => {
@@ -18,6 +19,8 @@ exports.createMeeting = async (req, res) => {
       // Find parent to verify
       const parent = await Parent.findById(parentId);
       if (!parent) return res.status(404).json({ error: 'Parent not found.' });
+      if (req.user?.role === 'parent') return res.status(403).json({ error: 'Parents cannot schedule meetings directly.' });
+      if (!canAccessParent(req, parent)) return forbidden(res);
 
       const meeting = new Meeting({
         parentId,
@@ -33,6 +36,8 @@ exports.createMeeting = async (req, res) => {
       const db = mockStore.loadData();
       const parent = db.parents.find(p => p.id === parentId);
       if (!parent) return res.status(404).json({ error: 'Parent not found.' });
+      if (req.user?.role === 'parent') return res.status(403).json({ error: 'Parents cannot schedule meetings directly.' });
+      if (!canAccessParent(req, parent)) return forbidden(res);
 
       finalMeeting = {
         id: `m_${Date.now()}`,
@@ -70,16 +75,19 @@ exports.listMeetings = async (req, res) => {
         parentName: m.parentId ? m.parentId.name : 'Unknown Parent',
         studentName: m.parentId ? m.parentId.studentName : 'Unknown Child',
         phone: m.parentId ? m.parentId.phone : '',
+        email: m.parentId ? m.parentId.email : '',
+        classGrade: m.parentId ? m.parentId.classGrade : '',
         title: m.title,
         description: m.description,
         dateTime: m.dateTime,
         status: m.status,
         reminderSent: m.reminderSent,
         meetingNotes: m.meetingNotes
-      }));
+      })).filter(item => canAccessParent(req, { _id: item.parentId, email: item.email, classGrade: item.classGrade }));
       return res.status(200).json(formatted);
     } else {
       const db = mockStore.loadData();
+      const allowedParentIds = new Set(filterParentsForRequest(req, db.parents).map(parent => parent.id));
       const formatted = db.meetings.map(m => {
         const parent = db.parents.find(p => p.id === m.parentId);
         return {
@@ -95,7 +103,7 @@ exports.listMeetings = async (req, res) => {
           reminderSent: m.reminderSent,
           meetingNotes: m.meetingNotes
         };
-      }).sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+      }).filter(item => allowedParentIds.has(item.parentId)).sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
       return res.status(200).json(formatted);
     }
   } catch (error) {
@@ -113,6 +121,9 @@ exports.updateMeeting = async (req, res) => {
     if (getIsConnected()) {
       const meeting = await Meeting.findById(id);
       if (!meeting) return res.status(404).json({ error: 'Meeting not found' });
+      if (req.user?.role === 'parent') return res.status(403).json({ error: 'Parents cannot update meeting records.' });
+      const parent = await Parent.findById(meeting.parentId);
+      if (!canAccessParent(req, parent)) return forbidden(res);
 
       if (status) meeting.status = status;
       if (meetingNotes !== undefined) meeting.meetingNotes = meetingNotes;
@@ -124,6 +135,9 @@ exports.updateMeeting = async (req, res) => {
       const db = mockStore.loadData();
       const meeting = db.meetings.find(m => m.id === id);
       if (!meeting) return res.status(404).json({ error: 'Meeting not found' });
+      if (req.user?.role === 'parent') return res.status(403).json({ error: 'Parents cannot update meeting records.' });
+      const parent = db.parents.find(p => p.id === meeting.parentId);
+      if (!canAccessParent(req, parent)) return forbidden(res);
 
       if (status) meeting.status = status;
       if (meetingNotes !== undefined) meeting.meetingNotes = meetingNotes;

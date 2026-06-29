@@ -1,117 +1,84 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { GraduationCap, Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { GraduationCap, Lock, Mail, Loader2, AlertCircle, ShieldCheck, Users, Heart, ArrowRight } from 'lucide-react';
+
+const accounts = {
+  admin: { label: 'Admin portal', email: 'admin@firstcry.com', password: 'admin', icon: ShieldCheck, note: 'Center analytics & operations' },
+  teacher: { label: 'Teacher portal', email: 'priya@firstcry.com', password: 'teacher', icon: Users, note: 'Classroom & student records' },
+  parent: { label: 'Parent portal', email: 'rahul.sharma@example.com', password: 'parent', icon: Heart, note: 'Child progress & engagement' }
+};
 
 export default function Login({ onLoginSuccess, backendUrl }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('admin');
+  const [email, setEmail] = useState(accounts.admin.email);
+  const [password, setPassword] = useState(accounts.admin.password);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const chooseRole = (nextRole) => {
+    setRole(nextRole);
+    setEmail(accounts[nextRole].email);
+    setPassword(accounts[nextRole].password);
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError('Please fill in all fields.');
-      return;
-    }
-
     setLoading(true);
     setError('');
-
     try {
-      const response = await axios.post(`${backendUrl}/api/login`, { email, password });
-      
-      if (response.data && response.data.user) {
-        onLoginSuccess(response.data.user, response.data.token);
-      }
+      const response = await axios.post(`${backendUrl}/api/auth/login`, { email, password });
+      onLoginSuccess(response.data.user, response.data.token);
     } catch (err) {
-      console.error('Login error:', err);
-      setError(err.response?.data?.error || 'Authentication failed. Please check your credentials.');
+      setError(err.response?.data?.error || 'Unable to sign in. Please check the selected demo account.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#FAF7F2] px-4 relative overflow-hidden">
-      {/* Dynamic glowing background blobs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-[#FF8562]/10 blur-3xl glow-glow" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-[#88B097]/10 blur-3xl glow-glow" style={{ animationDelay: '3s' }} />
+    <div className="min-h-screen grid lg:grid-cols-[1.08fr_.92fr] bg-[#f7f8fc]">
+      <section className="hidden lg:flex relative overflow-hidden bg-gradient-to-br from-[#0b4dd8] via-[#285ee9] to-[#6d52e8] text-white p-14 flex-col justify-between">
+        <div className="absolute inset-0 opacity-20" style={{backgroundImage:'radial-gradient(circle at 1px 1px, white 1px, transparent 0)', backgroundSize:'28px 28px'}} />
+        <div className="relative flex items-center gap-3">
+          <div className="h-11 w-11 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center"><GraduationCap /></div>
+          <div><p className="font-bold text-lg">FirstCry Intellitots</p><p className="text-xs text-blue-100">One school. Three connected experiences.</p></div>
+        </div>
+        <div className="relative max-w-xl">
+          <span className="inline-flex rounded-full bg-white/12 border border-white/20 px-4 py-2 text-xs font-bold tracking-wide mb-6">INTELLIGENT CHILDHOOD ECOSYSTEM</span>
+          <h1 className="text-5xl font-extrabold leading-[1.08] tracking-tight !text-white">Every child’s journey,<br/>beautifully connected.</h1>
+          <p className="mt-5 text-lg leading-relaxed text-blue-50/90 max-w-lg">A shared digital home for center leaders, teachers and families—built around progress, trust and joyful learning.</p>
+        </div>
+        <div className="relative grid grid-cols-3 gap-3 text-sm">
+          {['Smart insights','Clear communication','Happy families'].map(item => <div key={item} className="rounded-2xl bg-white/10 border border-white/15 p-4 font-semibold">{item}</div>)}
+        </div>
+      </section>
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="glass-panel p-8 shadow-2xl border-[#E6DDD0] bg-white/95">
-          
-          {/* Logo & Header */}
-          <div className="flex flex-col items-center mb-8">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-[#FF8562] to-[#FF6B4A] flex items-center justify-center shadow-lg shadow-[#FF8562]/35 mb-4">
-              <GraduationCap className="h-6 w-6 text-white" />
-            </div>
-            <h2 className="text-2xl font-extrabold text-[#4A433A] tracking-tight">FirstCry Intellitots</h2>
-            <p className="text-sm text-[#7D7263] mt-1 font-semibold">Parent Sentiment & Engagement Portal</p>
+      <section className="flex items-center justify-center p-6 md:p-12">
+        <div className="w-full max-w-lg">
+          <div className="lg:hidden flex items-center gap-3 mb-8"><div className="h-10 w-10 rounded-xl bg-[#155eef] text-white flex items-center justify-center"><GraduationCap size={20}/></div><b>FirstCry Intellitots</b></div>
+          <p className="text-sm font-bold text-[#155eef] mb-2">WELCOME BACK</p>
+          <h2 className="text-3xl font-extrabold text-[#172033]">Choose your portal</h2>
+          <p className="text-[#7b8499] mt-2 mb-7">Select a role to load its demo account and continue.</p>
+
+          <div className="grid sm:grid-cols-3 gap-3 mb-7">
+            {Object.entries(accounts).map(([key, account]) => {
+              const Icon = account.icon;
+              return <button type="button" key={key} onClick={() => chooseRole(key)} className={`text-left rounded-2xl border p-4 transition-all ${role === key ? 'border-[#155eef] bg-[#eef4ff] shadow-[0_8px_24px_rgba(21,94,239,.12)]' : 'border-[#e2e6ef] bg-white hover:border-[#b9c7e5]'}`}>
+                <Icon size={20} className={role === key ? 'text-[#155eef]' : 'text-[#6f7890]'} />
+                <p className="font-bold text-sm mt-3">{account.label}</p><p className="text-[10px] text-[#8a93a7] mt-1 leading-snug">{account.note}</p>
+              </button>;
+            })}
           </div>
 
-          {/* Form Actions */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="flex items-center gap-2.5 p-3.5 bg-rose-50/10 border border-rose-100 rounded-xl text-rose-600 text-xs font-semibold">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <div>
-              <label className="form-label" htmlFor="email">Administrative Email</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-3.5 h-4 w-4 text-[#9E9588]" />
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="name@firstcry.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="form-input pl-11"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="form-label mb-0" htmlFor="password">Security Password</label>
-                <span className="text-[10px] text-[#7D7263] font-semibold">Demo: admin / admin</span>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-3.5 h-4 w-4 text-[#9E9588]" />
-                <input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="form-input pl-11"
-                  required
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full btn-primary py-3 text-sm mt-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Validating credentials...</span>
-                </>
-              ) : (
-                <span>Access Console</span>
-              )}
-            </button>
+          <form onSubmit={handleSubmit} className="bg-white border border-[#e4e8f0] rounded-3xl p-6 shadow-[0_18px_50px_rgba(34,52,84,.08)] space-y-5">
+            {error && <div className="flex gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-700 text-xs"><AlertCircle size={16}/>{error}</div>}
+            <div><label className="form-label" htmlFor="email">Email address</label><div className="relative"><Mail className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} className="form-input pl-11" required/></div></div>
+            <div><div className="flex justify-between"><label className="form-label" htmlFor="password">Password</label><span className="text-[10px] text-[#155eef] font-bold">Demo credentials filled</span></div><div className="relative"><Lock className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="form-input pl-11" required/></div></div>
+            <button disabled={loading} className="w-full btn-primary py-3.5">{loading ? <><Loader2 size={17} className="animate-spin"/>Signing in...</> : <>Enter {accounts[role].label}<ArrowRight size={17}/></>}</button>
           </form>
-
         </div>
-      </div>
+      </section>
     </div>
   );
 }

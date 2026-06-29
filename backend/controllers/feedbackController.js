@@ -4,6 +4,7 @@ const Interaction = require('../models/Interaction');
 const { getIsConnected } = require('../config/db');
 const mockStore = require('../data/mockStore');
 const { normalizeText, analyzeSentiment, extractKeywords, calculateEngagementIndex, generateRecommendation } = require('../services/sentimentService');
+const { canAccessParent, filterParentsForRequest, forbidden } = require('../services/accessControl');
 
 // Create Feedback
 exports.createFeedback = async (req, res) => {
@@ -56,6 +57,7 @@ exports.createFeedback = async (req, res) => {
       }
 
       if (!parent) {
+        if (req.user?.role !== 'admin') return res.status(403).json({ error: 'Only the Admin can create admission parent records.' });
         parent = new Parent({
           name: parentName,
           email: email.toLowerCase(),
@@ -67,6 +69,7 @@ exports.createFeedback = async (req, res) => {
         });
         await parent.save();
       } else {
+        if (!canAccessParent(req, parent)) return forbidden(res);
         // Update details if supplied
         if (contactNumber) parent.phone = contactNumber;
         if (childName) parent.studentName = childName;
@@ -92,7 +95,7 @@ exports.createFeedback = async (req, res) => {
       const interaction = new Interaction({
         parentId: parent._id,
         childId: child._id,
-        type: 'email', // Defaulting to email feedback type
+        type: req.body.type || 'email',
         rawText: message,
         normalizedText: normalized,
         sentimentScore: score,
@@ -114,6 +117,7 @@ exports.createFeedback = async (req, res) => {
       }
 
       if (!parent) {
+        if (req.user?.role !== 'admin') return res.status(403).json({ error: 'Only the Admin can create admission parent records.' });
         parent = {
           id: `p_${Date.now()}`,
           name: parentName,
@@ -127,6 +131,7 @@ exports.createFeedback = async (req, res) => {
         };
         db.parents.push(parent);
       } else {
+        if (!canAccessParent(req, parent)) return forbidden(res);
         if (contactNumber) parent.phone = contactNumber;
         if (childName) parent.studentName = childName;
         parent.admissionStatus = activeStatus;
@@ -153,7 +158,7 @@ exports.createFeedback = async (req, res) => {
         id: `i_${Date.now()}`,
         parentId: parent.id,
         childId: child.id,
-        type: 'email',
+        type: req.body.type || 'email',
         rawText: message,
         normalizedText: normalized,
         sentimentScore: score,
@@ -203,10 +208,11 @@ exports.listFeedback = async (req, res) => {
         extractedKeywords: item.extractedKeywords,
         timestamp: item.timestamp,
         metadata: item.metadata
-      }));
+      })).filter(item => canAccessParent(req, { _id: item.parentId, email: item.email, classGrade: item.classGrade }));
       return res.status(200).json(formatted);
     } else {
       const db = mockStore.loadData();
+      const allowedParentIds = new Set(filterParentsForRequest(req, db.parents).map(parent => parent.id));
       const formatted = db.interactions.map(item => {
         const parent = db.parents.find(p => p.id === item.parentId);
         const child = db.children ? db.children.find(c => c.id === item.childId) : null;
@@ -227,7 +233,7 @@ exports.listFeedback = async (req, res) => {
           timestamp: item.timestamp,
           metadata: item.metadata
         };
-      }).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      }).filter(item => allowedParentIds.has(item.parentId)).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
       return res.status(200).json(formatted);
     }
   } catch (error) {
@@ -243,12 +249,14 @@ exports.getFeedbackById = async (req, res) => {
     if (getIsConnected()) {
       const item = await Interaction.findById(id).populate('parentId').populate('childId');
       if (!item) return res.status(404).json({ error: 'Feedback not found' });
+      if (!canAccessParent(req, item.parentId)) return forbidden(res);
       return res.status(200).json(item);
     } else {
       const db = mockStore.loadData();
       const item = db.interactions.find(i => i.id === id);
       if (!item) return res.status(404).json({ error: 'Feedback not found' });
       const parent = db.parents.find(p => p.id === item.parentId);
+            if (!canAccessParent(req, parent)) return forbidden(res);
       const child = db.children ? db.children.find(c => c.id === item.childId) : null;
       return res.status(200).json({
         ...item,
@@ -271,6 +279,7 @@ exports.getFeedbackDetail = async (req, res) => {
     if (getIsConnected()) {
       const parent = await Parent.findById(id);
       if (!parent) return res.status(404).json({ error: 'Parent record not found.' });
+      if (!canAccessParent(req, parent)) return forbidden(res);
 
       const children = await Child.find({ parentId: id });
       const interactions = await Interaction.find({ parentId: id }).populate('childId').sort({ timestamp: -1 });
@@ -286,6 +295,7 @@ exports.getFeedbackDetail = async (req, res) => {
       const db = mockStore.loadData();
       const parent = db.parents.find(p => p.id === id);
       if (!parent) return res.status(404).json({ error: 'Parent record not found.' });
+      if (!canAccessParent(req, parent)) return forbidden(res);
 
       const children = db.children ? db.children.filter(c => c.parentId === id) : [];
       const interactions = db.interactions
@@ -309,6 +319,42 @@ exports.getFeedbackDetail = async (req, res) => {
     }
   } catch (error) {
     console.error('Error fetching aggregated parent detail:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+// List Parents
+exports.listParents = async (req, res) => {
+  try {
+    if (getIsConnected()) {
+      const list = await Parent.find();
+      const formatted = list.map(item => ({
+        id: item._id || item.id,
+        parentId: item._id || item.id,
+        parentName: item.name,
+        email: item.email,
+        phone: item.phone,
+        studentName: item.studentName,
+        classGrade: item.classGrade,
+        admissionStatus: item.admissionStatus
+      })).filter(item => canAccessParent(req, { _id: item.parentId, email: item.email, classGrade: item.classGrade }));
+      return res.status(200).json(formatted);
+    } else {
+      const db = mockStore.loadData();
+      const formatted = db.parents.map(item => ({
+        id: item.id,
+        parentId: item.id,
+        parentName: item.name,
+        email: item.email,
+        phone: item.phone,
+        studentName: item.studentName,
+        classGrade: item.classGrade,
+        admissionStatus: item.admissionStatus
+      })).filter(item => canAccessParent(req, item));
+      return res.status(200).json(formatted);
+    }
+  } catch (error) {
+    console.error('Error fetching parents list:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };

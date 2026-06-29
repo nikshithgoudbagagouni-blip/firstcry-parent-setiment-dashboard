@@ -36,7 +36,7 @@ export default function NoticeGenerator({ backendUrl, preselectedParentId }) {
   const fetchParentsList = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${backendUrl}/api/feedback/list`);
+      const response = await axios.get(`${backendUrl}/api/feedback/parents`);
       
       const uniqueParents = [];
       const parentIds = new Set();
@@ -47,7 +47,8 @@ export default function NoticeGenerator({ backendUrl, preselectedParentId }) {
             id: item.parentId?._id || item.parentId || item.id,
             name: item.parentName,
             childName: item.studentName,
-            status: item.classGrade // classGrade or status fallback
+            status: item.classGrade, // classGrade or status fallback
+            email: item.email
           });
         }
       });
@@ -119,9 +120,27 @@ export default function NoticeGenerator({ backendUrl, preselectedParentId }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSend = () => {
-    setSentStatus(true);
-    setTimeout(() => setSentStatus(false), 3000);
+  const handleSend = async () => {
+    if (!formData.parentId || !noticeResult) return;
+    
+    setSubmitLoading(true);
+    try {
+      const response = await axios.post(`${backendUrl}/api/notices/send`, {
+        parentId: formData.parentId,
+        subject: noticeResult.subject,
+        body: noticeResult.body,
+        type: formData.type
+      });
+      
+      setSentStatus(true);
+      alert(`Notice successfully logged in center communications & emailed to: ${response.data.emailedTo}`);
+      setTimeout(() => setSentStatus(false), 4000);
+    } catch (err) {
+      console.error('Error dispatching notice email:', err);
+      alert('Failed to dispatch notice email. Check server logs.');
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   if (loading) {
@@ -161,7 +180,7 @@ export default function NoticeGenerator({ backendUrl, preselectedParentId }) {
                   <option value="" disabled>-- Select Recipient --</option>
                   {parents.map(p => (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({p.childName})
+                      {p.name} ({p.childName}) — {p.email}
                     </option>
                   ))}
                 </select>

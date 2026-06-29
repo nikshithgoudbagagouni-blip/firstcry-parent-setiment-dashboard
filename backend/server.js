@@ -2,7 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { connectDB } = require('./config/db');
+const { authenticate, requireRole } = require('./middleware/auth');
 
 // Load environment variables
 dotenv.config();
@@ -12,8 +15,10 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
+app.use(helmet({ contentSecurityPolicy: false, crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api', rateLimit({ windowMs: 60 * 1000, limit: 300, standardHeaders: true, legacyHeaders: false }));
 
 // Serve static assets if they exist
 const fs = require('fs');
@@ -25,39 +30,16 @@ if (fs.existsSync(frontendDistPath)) {
 // Connect to Database (MongoDB)
 connectDB();
 
-// Basic Authenticated Route handler
-app.post('/api/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required.' });
-  }
-
-  // Demo fallback user authentication matching our seed data
-  if (email.toLowerCase() === 'admin@firstcry.com' && password === 'admin') {
-    return res.status(200).json({
-      message: 'Login successful',
-      token: 'mock-jwt-token-admin',
-      user: { id: 'u1', name: 'Center Head Administrator', email: 'admin@firstcry.com', role: 'admin' }
-    });
-  } else if (email.toLowerCase() === 'priya@firstcry.com' && password === 'teacher') {
-    return res.status(200).json({
-      message: 'Login successful',
-      token: 'mock-jwt-token-teacher',
-      user: { id: 'u2', name: 'Class Teacher Priya', email: 'priya@firstcry.com', role: 'teacher' }
-    });
-  }
-
-  return res.status(401).json({ error: 'Invalid email or password.' });
-});
-
 // Bind API Routers
-app.use('/api/feedback', require('./routes/feedback'));
-app.use('/api/meeting', require('./routes/meeting'));
-app.use('/api/analytics', require('./routes/analytics'));
-app.use('/api/dashboard', require('./routes/dashboard'));
-app.use('/api/sentiment', require('./routes/sentiment'));
-app.use('/api/report', require('./routes/report'));
-app.use('/api/notices', require('./routes/notice'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/admin/users', require('./routes/users'));
+app.use('/api/feedback', authenticate, requireRole('admin', 'teacher', 'parent'), require('./routes/feedback'));
+app.use('/api/meeting', authenticate, requireRole('admin', 'teacher', 'parent'), require('./routes/meeting'));
+app.use('/api/analytics', authenticate, requireRole('admin'), require('./routes/analytics'));
+app.use('/api/dashboard', authenticate, requireRole('admin'), require('./routes/dashboard'));
+app.use('/api/sentiment', authenticate, requireRole('admin'), require('./routes/sentiment'));
+app.use('/api/report', authenticate, requireRole('admin'), require('./routes/report'));
+app.use('/api/notices', authenticate, requireRole('admin', 'teacher'), require('./routes/notice'));
 
 // Root Status Endpoint
 app.get('/api/status', (req, res) => {
