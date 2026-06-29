@@ -551,14 +551,27 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl,
         const latestStoryDoc = dataList.find(f => f.type === 'learning_story');
         const first = latestStoryDoc || dataList[0];
         const baseProgress = Math.round(70 + (first.rating * 5));
+
+        let rawKeywords = first.extractedKeywords || ['Communication', 'Development'];
+        let parsedKeywords = ['Communication', 'Development'];
+        try {
+          if (Array.isArray(rawKeywords)) {
+            parsedKeywords = rawKeywords;
+          } else if (typeof rawKeywords === 'string') {
+            parsedKeywords = JSON.parse(rawKeywords);
+          }
+        } catch (e) {
+          console.warn("Failed parsing extractedKeywords, fallback to default", e);
+        }
+
         setStudentData({
-          parentName: first.parentName || user.name,
+          parentName: first.parentName || user?.name || 'Parent',
           studentName: first.studentName || 'Your Child',
           classGrade: first.classGrade || 'Nursery B',
           attendance: '96%',
           joyScore: (first.rating * 2).toFixed(1),
           latestStory: first.rawText || 'Your child is doing beautifully in all class activities.',
-          keywords: first.extractedKeywords || ['Communication', 'Development'],
+          keywords: Array.isArray(parsedKeywords) ? parsedKeywords : ['Communication', 'Development'],
           progress: [
             { name: 'Communication & language', value: Math.min(100, baseProgress + 4) },
             { name: 'Social confidence', value: Math.min(100, baseProgress - 2) },
@@ -831,11 +844,11 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl,
   if (page === 'progress') {
     return (
       <PortalShell>
-        <Header eyebrow="Parent portal" title={`${studentData.studentName}’s learning journey`} subtitle="A gentle view of strengths, milestones and what comes next." user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} />
+        <Header eyebrow="Parent portal" title={`${studentData?.studentName || 'Your Child'}’s learning journey`} subtitle="A gentle view of strengths, milestones and what comes next." user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} />
         <div className="grid lg:grid-cols-[1fr_360px] gap-6">
           <div className="portal-card p-7">
             <h3 className="font-extrabold mb-6">Development areas</h3>
-            {studentData.progress.map(p => (
+            {(Array.isArray(studentData?.progress) ? studentData.progress : []).map(p => (
               <div key={p.name} className="mb-5">
                 <div className="flex justify-between text-xs font-bold mb-2">
                   <span>{p.name}</span>
@@ -864,13 +877,13 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl,
 
   return (
     <PortalShell>
-      <Header eyebrow="Parent portal" title={`Hello, ${user.name.split(' ')[0]}! 👋`} subtitle={`${studentData.studentName} had a bright, curious day at FirstCry.`} user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} />
+      <Header eyebrow="Parent portal" title={`Hello, ${(user?.name || 'Parent').split(' ')[0]}! 👋`} subtitle={`${studentData?.studentName || 'Your child'} had a bright, curious day at FirstCry.`} user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} backendUrl={backendUrl} />
       <section className="rounded-[28px] bg-gradient-to-r from-[#155eef] to-[#6651df] text-white p-7 md:p-9 relative overflow-hidden">
         <div className="absolute -right-10 -top-20 h-64 w-64 rounded-full bg-white/10" />
         <div className="relative flex flex-col md:flex-row justify-between gap-6">
           <div>
             <p className="text-blue-100 text-xs font-bold">TODAY AT A GLANCE</p>
-            <h3 className="text-3xl font-extrabold !text-white mt-2">{studentData.studentName} is doing wonderfully.</h3>
+            <h3 className="text-3xl font-extrabold !text-white mt-2">{studentData?.studentName || 'Your Child'} is doing wonderfully.</h3>
             <p className="text-blue-100 mt-2 text-sm">Present · 4 activities completed · 1 new classroom moment</p>
           </div>
           <div className="flex gap-3">
@@ -899,7 +912,7 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl,
           <div className="mt-5 p-5 rounded-2xl bg-[#faf7ff] border border-[#eee8ff]">
             <p className="text-sm leading-relaxed text-[#58627a]">{studentData.latestStory}</p>
             <div className="flex gap-2 mt-4">
-              {studentData.keywords.map(kw => (
+              {(Array.isArray(studentData?.keywords) ? studentData.keywords : []).map(kw => (
                 <StatusPill key={kw}>{kw}</StatusPill>
               ))}
             </div>
