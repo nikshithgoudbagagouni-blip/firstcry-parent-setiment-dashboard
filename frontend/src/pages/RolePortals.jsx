@@ -543,8 +543,8 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl,
         })
       ]);
       
-      setMeetings(meetingsRes.data);
-      const dataList = feedbackRes.data;
+      setMeetings(Array.isArray(meetingsRes.data) ? meetingsRes.data : []);
+      const dataList = Array.isArray(feedbackRes.data) ? feedbackRes.data : [];
       setFeed(dataList);
 
       if (dataList.length > 0) {
@@ -707,14 +707,14 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl,
   }
 
   const messagesList = [
-    ...meetings.map(m => ({
+    ...(Array.isArray(meetings) ? meetings : []).map(m => ({
       sender: 'Center Office',
       text: `Your parent-teacher meeting is scheduled: "${m.title}". Status: ${m.status}. Notes: ${m.meetingNotes || 'No notes shared yet.'}`,
       time: new Date(m.dateTime).toLocaleDateString(undefined, { hour: '2-digit', minute: '2-digit' })
     })),
-    ...feed.filter(f => f.type === 'email' || f.type === 'learning_story').map(f => ({
+    ...(Array.isArray(feed) ? feed : []).filter(f => f && (f.type === 'email' || f.type === 'learning_story')).map(f => ({
       sender: f.type === 'learning_story' ? 'Priya Ma’am (Teacher)' : 'School Operations',
-      text: f.rawText,
+      text: f.rawText || '',
       time: new Date(f.timestamp).toLocaleDateString(undefined, { hour: '2-digit', minute: '2-digit' })
     }))
   ];

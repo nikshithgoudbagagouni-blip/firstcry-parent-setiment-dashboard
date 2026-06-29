@@ -19,6 +19,56 @@ const savedSession = (() => {
   catch { return {}; }
 })();
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
+          <div className="bg-white border border-red-200 rounded-3xl p-8 max-w-xl w-full shadow-lg space-y-4">
+            <h2 className="text-xl font-extrabold text-red-700">Application Error</h2>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Something went wrong while rendering this page. Below is the error detail:
+            </p>
+            <pre className="p-4 bg-red-50 text-red-800 rounded-2xl text-xs font-mono overflow-auto max-h-48 whitespace-pre-wrap">
+              {this.state.error?.toString()}
+              {"\n"}
+              {this.state.error?.stack}
+            </pre>
+            <div className="flex gap-3 pt-2">
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-4 py-2.5 bg-[#155eef] text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition cursor-pointer"
+              >
+                Reload Page
+              </button>
+              <button 
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.reload();
+                }} 
+                className="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition cursor-pointer"
+              >
+                Reset Site Data
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState('');
@@ -43,15 +93,17 @@ export default function App() {
     setCurrentPage('dashboard');
   };
 
-  const handleLogout = useCallback((notifyServer = true) => {
-    if (notifyServer && token) axios.post(`${backendUrl}/api/auth/logout`).catch(() => {});
-    setIsAuthenticated(false);
+  const handleLogout = useCallback((shouldCallApi = true) => {
+    if (shouldCallApi && token) {
+      axios.post(`${backendUrl}/api/auth/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).catch(() => {});
+    }
     setUser(null);
     setToken('');
-    setCurrentPage('dashboard');
-    setSelectedParentId('');
-    delete axios.defaults.headers.common.Authorization;
+    setIsAuthenticated(false);
     localStorage.removeItem('firstcry-session');
+    axios.defaults.headers.common.Authorization = '';
   }, [backendUrl, token]);
 
   const handleSwitchRole = async (role) => {
@@ -61,7 +113,7 @@ export default function App() {
       email = 'priya@firstcry.com';
       password = 'teacher';
     } else if (role === 'parent') {
-      email = 'rahul.sharma@example.com';
+      email = 'parent';
       password = 'parent';
     }
     
@@ -77,7 +129,9 @@ export default function App() {
   useEffect(() => {
     if (!token) return;
     axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-    axios.get(`${backendUrl}/api/auth/me`).then(({ data }) => {
+    axios.get(`${backendUrl}/api/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(({ data }) => {
       setUser(data.user);
       localStorage.setItem('firstcry-session', JSON.stringify({ token, user: data.user }));
     }).catch(() => handleLogout(false));
@@ -164,47 +218,51 @@ export default function App() {
 
   if (!isAuthenticated) {
     return (
-      <Login 
-        onLoginSuccess={handleLoginSuccess} 
-        backendUrl={backendUrl} 
-        setBackendUrl={(url) => {
-          localStorage.setItem('firstcry-backend-url', url);
-          setBackendUrl(url);
-        }}
-      />
+      <ErrorBoundary>
+        <Login 
+          onLoginSuccess={handleLoginSuccess} 
+          backendUrl={backendUrl} 
+          setBackendUrl={(url) => {
+            localStorage.setItem('firstcry-backend-url', url);
+            setBackendUrl(url);
+          }}
+        />
+      </ErrorBoundary>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-[#f6f7fb] text-[#172033] overflow-x-hidden">
-      
-      {/* Sidebar Navigation */}
-      <Sidebar 
-        currentPage={currentPage} 
-        setCurrentPage={(page) => {
-          // Reset preselected parent ID when navigating away from action targets
-          if (page !== 'meeting-scheduler' && page !== 'notice-generator') {
-            setSelectedParentId('');
-          }
-          setCurrentPage(page);
-        }} 
-        onLogout={handleLogout}
-        user={user}
-        onSwitchRole={handleSwitchRole}
-      />
+    <ErrorBoundary>
+      <div className="min-h-screen flex bg-[#f6f7fb] text-[#172033] overflow-x-hidden">
+        
+        {/* Sidebar Navigation */}
+        <Sidebar 
+          currentPage={currentPage} 
+          setCurrentPage={(page) => {
+            // Reset preselected parent ID when navigating away from action targets
+            if (page !== 'meeting-scheduler' && page !== 'notice-generator') {
+              setSelectedParentId('');
+            }
+            setCurrentPage(page);
+          }} 
+          onLogout={handleLogout}
+          user={user}
+          onSwitchRole={handleSwitchRole}
+        />
 
-      {/* Main Content Area Panel */}
-      <main className="flex-1 flex flex-col overflow-y-auto">
-        {user?.role === 'admin' && (
-          <div className="w-full max-w-7xl mx-auto px-8 pt-6 flex justify-end">
-            <HeaderTools user={user} onLogout={handleLogout} setCurrentPage={setCurrentPage} />
+        {/* Main Content Area Panel */}
+        <main className="flex-1 flex flex-col overflow-y-auto">
+          {user?.role === 'admin' && (
+            <div className="w-full max-w-7xl mx-auto px-8 pt-6 flex justify-end">
+              <HeaderTools user={user} onLogout={handleLogout} setCurrentPage={setCurrentPage} />
+            </div>
+          )}
+          <div className="flex-grow pb-12">
+            {renderPage()}
           </div>
-        )}
-        <div className="flex-grow pb-12">
-          {renderPage()}
-        </div>
-      </main>
+        </main>
 
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
