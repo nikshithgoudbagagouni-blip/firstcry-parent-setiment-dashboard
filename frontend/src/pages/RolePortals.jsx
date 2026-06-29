@@ -12,7 +12,7 @@ const students = [
 
 import HeaderTools from '../components/HeaderTools';
 
-function Header({ eyebrow, title, subtitle, user, onLogout, setCurrentPage }) {
+function Header({ eyebrow, title, subtitle, user, onLogout, setCurrentPage, backendUrl }) {
   return (
     <header className="flex items-start justify-between gap-5 mb-8 relative">
       <div>
@@ -20,7 +20,7 @@ function Header({ eyebrow, title, subtitle, user, onLogout, setCurrentPage }) {
         <h2 className="text-3xl font-extrabold text-[#172033] mt-1">{title}</h2>
         <p className="text-sm text-[#788299] mt-1">{subtitle}</p>
       </div>
-      <HeaderTools user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} />
+      <HeaderTools user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} backendUrl={backendUrl} />
     </header>
   );
 }

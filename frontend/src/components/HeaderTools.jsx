@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import axios from 'axios';
 import { Search, Bell, X, LogOut } from 'lucide-react';
 
-export default function HeaderTools({ user, onLogout, setCurrentPage }) {
+export default function HeaderTools({ user, onLogout, setCurrentPage, backendUrl = 'https://firstcry-parent-setiment-dashboard.onrender.com' }) {
   const isTeacher = user?.role === 'teacher';
   const isAdmin = user?.role === 'admin' || !user?.role;
   const isParent = user?.role === 'parent';
@@ -31,8 +31,8 @@ export default function HeaderTools({ user, onLogout, setCurrentPage }) {
     setLoadingRealData(true);
     try {
       const [feedbackRes, meetingRes] = await Promise.all([
-        axios.get('/api/feedback/list').catch(() => ({ data: [] })),
-        axios.get('/api/meeting/list').catch(() => ({ data: [] }))
+        axios.get(`${backendUrl}/api/feedback/list`).catch(() => ({ data: [] })),
+        axios.get(`${backendUrl}/api/meeting/list`).catch(() => ({ data: [] }))
       ]);
 
       const feedbacks = feedbackRes.data || [];
