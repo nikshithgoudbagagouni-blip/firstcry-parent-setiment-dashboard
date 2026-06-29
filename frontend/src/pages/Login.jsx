@@ -146,7 +146,7 @@ export default function Login({ onLoginSuccess, backendUrl, setBackendUrl }) {
             )}
 
             {error && <div className="flex gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-700 text-xs"><AlertCircle size={16}/>{error}</div>}
-            <div><label className="form-label" htmlFor="email">Email address</label><div className="relative"><Mail className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} className="form-input pl-11" required/></div></div>
+            <div><label className="form-label" htmlFor="email">Email address or username</label><div className="relative"><Mail className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="email" type="text" value={email} onChange={e=>setEmail(e.target.value)} className="form-input pl-11" required/></div></div>
             <div><div className="flex justify-between"><label className="form-label" htmlFor="password">Password</label><span className="text-[10px] text-[#155eef] font-bold">Demo credentials filled</span></div><div className="relative"><Lock className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="form-input pl-11" required/></div></div>
             <button disabled={loading} className="w-full btn-primary py-3.5">{loading ? <><Loader2 size={17} className="animate-spin"/>Signing in...</> : <>Enter {accounts[role].label}<ArrowRight size={17}/></>}</button>
             

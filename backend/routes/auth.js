@@ -9,9 +9,14 @@ const router = express.Router();
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many sign-in attempts. Please try again later.' } });
 
 router.post('/login', loginLimiter, async (req, res) => {
-  const email = String(req.body.email || '').trim().toLowerCase();
+  let email = String(req.body.email || '').trim().toLowerCase();
   const password = String(req.body.password || '');
   if (!email || !password || password.length > 128) return res.status(400).json({ error: 'Email and password are required.' });
+
+  // Map role name shortcuts to correct emails
+  if (email === 'parent') email = 'rahul.sharma@example.com';
+  else if (email === 'teacher') email = 'priya@firstcry.com';
+  else if (email === 'admin') email = 'admin@firstcry.com';
 
   let user = null;
   if (getIsConnected()) {
