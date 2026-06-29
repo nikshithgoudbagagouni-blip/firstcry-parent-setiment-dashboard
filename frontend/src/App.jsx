@@ -26,9 +26,8 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedParentId, setSelectedParentId] = useState('');
 
-  // Define backend connection endpoint.
   const [backendUrl, setBackendUrl] = useState(() => {
-    return localStorage.getItem('firstcry-backend-url') || import.meta.env.VITE_API_URL || '';
+    return localStorage.getItem('firstcry-backend-url') || import.meta.env.VITE_API_URL || 'https://firstcry-parent-setiment-dashboard.onrender.com';
   });
 
   const handleLoginSuccess = (userData, userToken) => {
