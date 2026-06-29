@@ -92,6 +92,7 @@ export default function App() {
           user={user} 
           onLogout={handleLogout} 
           backendUrl={backendUrl}
+          token={token}
         />
       );
     }
@@ -104,6 +105,7 @@ export default function App() {
           user={user} 
           onLogout={handleLogout} 
           backendUrl={backendUrl}
+          token={token}
         />
       );
     }
