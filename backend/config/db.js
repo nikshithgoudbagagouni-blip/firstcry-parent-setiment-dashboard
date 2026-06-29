@@ -11,7 +11,7 @@ async function connectDB() {
     return true;
   }
 
-  const connectionURI = process.env.MONGO_URI || 'mongodb://localhost:27017/firstcry_sentiment';
+  const connectionURI = process.env.MONGO_URI || 'postgresql://postgres.gcrhbkptymbbbvwvsmst:Nikshith%40123@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres';
   
   if (connectionURI.startsWith('postgres://') || connectionURI.startsWith('postgresql://')) {
     try {
