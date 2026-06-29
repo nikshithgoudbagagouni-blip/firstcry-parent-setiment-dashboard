@@ -27,7 +27,11 @@ export default function App() {
   const [selectedParentId, setSelectedParentId] = useState('');
 
   const [backendUrl, setBackendUrl] = useState(() => {
-    return localStorage.getItem('firstcry-backend-url') || import.meta.env.VITE_API_URL || 'https://firstcry-parent-setiment-dashboard.onrender.com';
+    const stored = localStorage.getItem('firstcry-backend-url');
+    if (stored && stored !== 'undefined' && stored !== 'null' && stored.trim() !== '') {
+      return stored;
+    }
+    return import.meta.env.VITE_API_URL || 'https://firstcry-parent-setiment-dashboard.onrender.com';
   });
 
   const handleLoginSuccess = (userData, userToken) => {

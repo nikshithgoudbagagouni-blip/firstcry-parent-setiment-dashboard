@@ -515,71 +515,75 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl 
   const [feedback, setFeedback] = useState('');
   const [rating, setRating] = useState(5);
   const [thanks, setThanks] = useState(false);
-  
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [meetings, setMeetings] = useState([]);
   const [feed, setFeed] = useState([]);
   const [activeMoment, setActiveMoment] = useState(null);
+  const [error, setError] = useState(null);
+
+  const fetchParentStudentData = useCallback(async () => {
+    try {
+      setError(null);
+      setLoading(true);
+      const [feedbackRes, meetingsRes] = await Promise.all([
+        axios.get(`${backendUrl}/api/feedback/list`),
+        axios.get(`${backendUrl}/api/meeting/list`)
+      ]);
+      
+      setMeetings(meetingsRes.data);
+      const dataList = feedbackRes.data;
+      setFeed(dataList);
+
+      if (dataList.length > 0) {
+        const latestStoryDoc = dataList.find(f => f.type === 'learning_story');
+        const first = latestStoryDoc || dataList[0];
+        const baseProgress = Math.round(70 + (first.rating * 5));
+        setStudentData({
+          parentName: first.parentName || user.name,
+          studentName: first.studentName || 'Your Child',
+          classGrade: first.classGrade || 'Nursery B',
+          attendance: '96%',
+          joyScore: (first.rating * 2).toFixed(1),
+          latestStory: first.rawText || 'Your child is doing beautifully in all class activities.',
+          keywords: first.extractedKeywords || ['Communication', 'Development'],
+          progress: [
+            { name: 'Communication & language', value: Math.min(100, baseProgress + 4) },
+            { name: 'Social confidence', value: Math.min(100, baseProgress - 2) },
+            { name: 'Creative expression', value: Math.min(100, baseProgress + 6) },
+            { name: 'Early numeracy', value: Math.min(100, baseProgress - 6) },
+            { name: 'Movement & coordination', value: Math.min(100, baseProgress + 2) }
+          ]
+        });
+      } else {
+        setStudentData({
+          parentName: user.name,
+          studentName: 'Aarav Sharma',
+          classGrade: 'Nursery B',
+          attendance: '96%',
+          joyScore: '8.8',
+          latestStory: 'Aarav was fully engaged during story explorers today. He named every character, waited patiently for his turn and helped a friend remember the ending.',
+          keywords: ['Communication', 'Kindness'],
+          progress: [
+            { name: 'Communication & language', value: 92 },
+            { name: 'Social confidence', value: 86 },
+            { name: 'Creative expression', value: 94 },
+            { name: 'Early numeracy', value: 78 },
+            { name: 'Movement & coordination', value: 88 }
+          ]
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching parent student data:', err);
+      setError('Failed to connect to the database. Please check your backend connection.');
+    } finally {
+      setLoading(false);
+    }
+  }, [user, backendUrl]);
 
   useEffect(() => {
-    const fetchParentStudentData = async () => {
-      try {
-        const [feedbackRes, meetingsRes] = await Promise.all([
-          axios.get(`${backendUrl}/api/feedback/list`),
-          axios.get(`${backendUrl}/api/meeting/list`)
-        ]);
-        
-        setMeetings(meetingsRes.data);
-        const dataList = feedbackRes.data;
-        setFeed(dataList);
-
-        if (dataList.length > 0) {
-          const latestStoryDoc = dataList.find(f => f.type === 'learning_story');
-          const first = latestStoryDoc || dataList[0];
-          const baseProgress = Math.round(70 + (first.rating * 5));
-          setStudentData({
-            parentName: first.parentName || user.name,
-            studentName: first.studentName || 'Your Child',
-            classGrade: first.classGrade || 'Nursery B',
-            attendance: '96%',
-            joyScore: (first.rating * 2).toFixed(1),
-            latestStory: first.rawText || 'Your child is doing beautifully in all class activities.',
-            keywords: first.extractedKeywords || ['Communication', 'Development'],
-            progress: [
-              { name: 'Communication & language', value: Math.min(100, baseProgress + 4) },
-              { name: 'Social confidence', value: Math.min(100, baseProgress - 2) },
-              { name: 'Creative expression', value: Math.min(100, baseProgress + 6) },
-              { name: 'Early numeracy', value: Math.min(100, baseProgress - 6) },
-              { name: 'Movement & coordination', value: Math.min(100, baseProgress + 2) }
-            ]
-          });
-        } else {
-          setStudentData({
-            parentName: user.name,
-            studentName: 'Aarav Sharma',
-            classGrade: 'Nursery B',
-            attendance: '96%',
-            joyScore: '8.8',
-            latestStory: 'Aarav was fully engaged during story explorers today. He named every character, waited patiently for his turn and helped a friend remember the ending.',
-            keywords: ['Communication', 'Kindness'],
-            progress: [
-              { name: 'Communication & language', value: 92 },
-              { name: 'Social confidence', value: 86 },
-              { name: 'Creative expression', value: 94 },
-              { name: 'Early numeracy', value: 78 },
-              { name: 'Movement & coordination', value: 88 }
-            ]
-          });
-        }
-      } catch (err) {
-        console.error('Error fetching parent student data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchParentStudentData();
-  }, [user]);
+  }, [fetchParentStudentData]);
 
   const handleSubmitFeedback = async () => {
     if (!feedback.trim()) return;
@@ -631,9 +635,40 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl 
   if (loading) {
     return (
       <PortalShell>
-        <Header eyebrow="Parent portal" title="Loading Workspace..." subtitle="Connecting to school database" user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} />
+        <Header eyebrow="Parent portal" title="Loading Workspace..." subtitle="Connecting to school database" user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} backendUrl={backendUrl} />
         <div className="portal-card p-12 text-center text-slate-500 font-medium">
           Loading learning journey, notifications, and classroom moments...
+        </div>
+      </PortalShell>
+    );
+  }
+
+  if (error || !studentData) {
+    return (
+      <PortalShell>
+        <Header eyebrow="Parent portal" title="Connection Error" subtitle="Could not sync data" user={user} onLogout={onLogout} setCurrentPage={setCurrentPage} backendUrl={backendUrl} />
+        <div className="portal-card p-8 text-center max-w-lg mx-auto space-y-4">
+          <p className="text-sm text-red-650 font-bold">{error || 'No student data found for this parent.'}</p>
+          <div className="flex gap-3 justify-center">
+            <button 
+              onClick={fetchParentStudentData} 
+              className="px-4 py-2.5 bg-[#155eef] text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition cursor-pointer"
+            >
+              Retry Connection
+            </button>
+            <button 
+              onClick={() => {
+                const newUrl = prompt("Enter custom backend API URL:", backendUrl);
+                if (newUrl !== null) {
+                  localStorage.setItem('firstcry-backend-url', newUrl);
+                  window.location.reload();
+                }
+              }}
+              className="px-4 py-2.5 border border-slate-300 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition cursor-pointer"
+            >
+              Configure URL
+            </button>
+          </div>
         </div>
       </PortalShell>
     );
