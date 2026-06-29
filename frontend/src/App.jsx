@@ -87,6 +87,7 @@ export default function App() {
           setCurrentPage={setCurrentPage} 
           user={user} 
           onLogout={handleLogout} 
+          backendUrl={backendUrl}
         />
       );
     }
@@ -98,6 +99,7 @@ export default function App() {
           setCurrentPage={setCurrentPage} 
           user={user} 
           onLogout={handleLogout} 
+          backendUrl={backendUrl}
         />
       );
     }

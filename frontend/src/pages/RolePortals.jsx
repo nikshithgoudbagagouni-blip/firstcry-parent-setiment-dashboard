@@ -32,7 +32,7 @@ function Metric({ icon:Icon, label, value, hint, tone='blue' }) {
 
 function StatusPill({ children, danger=false }) { return <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${danger?'bg-red-50 text-red-600':'bg-emerald-50 text-emerald-700'}`}>{children}</span>; }
 
-export function TeacherPortal({ page, setCurrentPage, user, onLogout }) {
+export function TeacherPortal({ page, setCurrentPage, user, onLogout, backendUrl }) {
   const [query, setQuery] = useState('');
   const [dbStudents, setDbStudents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -63,8 +63,8 @@ export function TeacherPortal({ page, setCurrentPage, user, onLogout }) {
     const fetchStudents = async () => {
       try {
         const [parentsRes, feedbackRes] = await Promise.all([
-          axios.get('/api/feedback/parents'),
-          axios.get('/api/feedback/list')
+          axios.get(`${backendUrl}/api/feedback/parents`),
+          axios.get(`${backendUrl}/api/feedback/list`)
         ]);
         
         const feedbackList = feedbackRes.data;
@@ -150,7 +150,7 @@ export function TeacherPortal({ page, setCurrentPage, user, onLogout }) {
         eventAttended: false
       };
       
-      const res = await axios.post('/api/feedback/create', payload);
+      const res = await axios.post(`${backendUrl}/api/feedback/create`, payload);
       
       const newMsg = {
         id: res.data.interaction?.id || `msg_${Date.now()}`,
@@ -345,7 +345,7 @@ export function TeacherPortal({ page, setCurrentPage, user, onLogout }) {
                   surveyCompleted: true,
                   eventAttended: false
                 };
-                await axios.post('/api/feedback/create', payload);
+                await axios.post(`${backendUrl}/api/feedback/create`, payload);
                 setTeacherFbSent(true);
                 setTeacherFbText('');
               } catch (err) {
@@ -510,7 +510,7 @@ function StudentTable({ students, onSelectStudent }) { return <div className="ov
 function Avatar({student}) { return <div className="h-9 w-9 rounded-xl flex items-center justify-center text-xs font-extrabold text-[#33405a]" style={{background:student.color}}>{student.initials}</div>; }
 function PortalShell({children}) { return <div className="w-full max-w-[1380px] mx-auto p-6 md:p-8">{children}</div>; }
 
-export function ParentPortal({ page, setCurrentPage, user, onLogout }) {
+export function ParentPortal({ page, setCurrentPage, user, onLogout, backendUrl }) {
   const [rsvp, setRsvp] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [rating, setRating] = useState(5);
@@ -526,8 +526,8 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout }) {
     const fetchParentStudentData = async () => {
       try {
         const [feedbackRes, meetingsRes] = await Promise.all([
-          axios.get('/api/feedback/list'),
-          axios.get('/api/meeting/list')
+          axios.get(`${backendUrl}/api/feedback/list`),
+          axios.get(`${backendUrl}/api/meeting/list`)
         ]);
         
         setMeetings(meetingsRes.data);
@@ -596,7 +596,7 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout }) {
         surveyCompleted: true,
         eventAttended: false
       };
-      await axios.post('/api/feedback/create', payload);
+      await axios.post(`${backendUrl}/api/feedback/create`, payload);
       setThanks(true);
       setFeedback('');
     } catch (err) {
@@ -622,7 +622,7 @@ export function ParentPortal({ page, setCurrentPage, user, onLogout }) {
         surveyCompleted: false,
         eventAttended: nextRsvp
       };
-      await axios.post('/api/feedback/create', payload);
+      await axios.post(`${backendUrl}/api/feedback/create`, payload);
     } catch (err) {
       console.error('Error submitting RSVP feedback:', err);
     }
