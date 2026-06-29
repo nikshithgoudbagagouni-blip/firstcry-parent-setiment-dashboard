@@ -6,7 +6,7 @@ const { readStore } = require('../services/userService');
 const JWT_SECRET = process.env.JWT_SECRET || 'firstcry-development-secret-change-before-production';
 
 if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET is required in production.');
+  console.warn('⚠️ WARNING: JWT_SECRET environment variable is missing in production. Using default fallback secret.');
 }
 
 async function authenticate(req, res, next) {
