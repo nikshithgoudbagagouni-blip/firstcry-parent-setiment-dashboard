@@ -27,7 +27,9 @@ export default function App() {
   const [selectedParentId, setSelectedParentId] = useState('');
 
   // Define backend connection endpoint.
-  const backendUrl = import.meta.env.VITE_API_URL || '';
+  const [backendUrl, setBackendUrl] = useState(() => {
+    return localStorage.getItem('firstcry-backend-url') || import.meta.env.VITE_API_URL || '';
+  });
 
   const handleLoginSuccess = (userData, userToken) => {
     setUser(userData);
@@ -158,6 +160,10 @@ export default function App() {
       <Login 
         onLoginSuccess={handleLoginSuccess} 
         backendUrl={backendUrl} 
+        setBackendUrl={(url) => {
+          localStorage.setItem('firstcry-backend-url', url);
+          setBackendUrl(url);
+        }}
       />
     );
   }

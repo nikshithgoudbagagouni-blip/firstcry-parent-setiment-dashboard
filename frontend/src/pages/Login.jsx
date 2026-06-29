@@ -7,8 +7,7 @@ const accounts = {
   teacher: { label: 'Teacher portal', email: 'priya@firstcry.com', password: 'teacher', icon: Users, note: 'Classroom & student records' },
   parent: { label: 'Parent portal', email: 'rahul.sharma@example.com', password: 'parent', icon: Heart, note: 'Child progress & engagement' }
 };
-
-export default function Login({ onLoginSuccess, backendUrl }) {
+export default function Login({ onLoginSuccess, backendUrl, setBackendUrl }) {
   const [role, setRole] = useState('admin');
   const [email, setEmail] = useState(accounts.admin.email);
   const [password, setPassword] = useState(accounts.admin.password);
@@ -16,8 +15,11 @@ export default function Login({ onLoginSuccess, backendUrl }) {
   const [error, setError] = useState('');
   const [backendStatus, setBackendStatus] = useState('checking'); // 'checking', 'online', 'offline'
   const [databaseStatus, setDatabaseStatus] = useState('');
+  const [showSettings, setShowSettings] = useState(false);
+  const [tempUrl, setTempUrl] = useState(backendUrl);
 
   useEffect(() => {
+    setBackendStatus('checking');
     axios.get(`${backendUrl}/api/status`)
       .then(res => {
         setBackendStatus('online');
@@ -29,11 +31,20 @@ export default function Login({ onLoginSuccess, backendUrl }) {
       });
   }, [backendUrl]);
 
+  useEffect(() => {
+    setTempUrl(backendUrl);
+  }, [backendUrl]);
+
   const chooseRole = (nextRole) => {
     setRole(nextRole);
     setEmail(accounts[nextRole].email);
     setPassword(accounts[nextRole].password);
     setError('');
+  };
+
+  const handleSaveSettings = (e) => {
+    e.preventDefault();
+    setBackendUrl(tempUrl);
   };
 
   const handleSubmit = async (e) => {
@@ -45,7 +56,7 @@ export default function Login({ onLoginSuccess, backendUrl }) {
       onLoginSuccess(response.data.user, response.data.token);
     } catch (err) {
       if (!err.response) {
-        setError(`Backend connection error: ${err.message}. Please verify that the backend server is running on port 5001.`);
+        setError(`Backend connection error: ${err.message}. Please verify that the backend server is running and accessible.`);
       } else {
         setError(err.response?.data?.error || 'Unable to sign in. Please check the selected demo account.');
       }
@@ -93,19 +104,51 @@ export default function Login({ onLoginSuccess, backendUrl }) {
             {backendStatus === 'offline' && (
               <div className="flex items-start gap-2.5 p-3.5 bg-rose-50 border border-rose-100 rounded-2xl text-rose-700 text-xs">
                 <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-600"/>
-                <div>
+                <div className="flex-grow">
                   <p className="font-bold text-rose-800">Backend Server Offline</p>
                   <p className="text-rose-600/90 mt-0.5 leading-relaxed">
-                    The frontend cannot connect to the backend at <code>{backendUrl || 'relative proxy (port 5001)'}</code>. 
-                    Please make sure you started the project with <code>npm run dev</code> from the root folder.
+                    Cannot connect to backend at <code>{backendUrl || 'relative proxy (port 5001)'}</code>.
                   </p>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowSettings(!showSettings)} 
+                    className="mt-2 text-[#155eef] font-bold hover:underline block"
+                  >
+                    {showSettings ? 'Hide Settings' : 'Configure Backend URL'}
+                  </button>
                 </div>
               </div>
             )}
+            
+            {showSettings && (
+              <div className="p-3.5 bg-[#f8f9fc] border border-[#e2e6ef] rounded-2xl space-y-2.5">
+                <p className="text-[10px] font-bold text-[#475467]">BACKEND API BASE URL</p>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    value={tempUrl} 
+                    onChange={e => setTempUrl(e.target.value)} 
+                    placeholder="e.g. http://localhost:5001 or https://..." 
+                    className="form-input text-xs py-1.5 flex-grow"
+                  />
+                  <button 
+                    type="button" 
+                    onClick={handleSaveSettings} 
+                    className="btn-primary text-xs px-3.5 py-1.5 shrink-0"
+                  >
+                    Save
+                  </button>
+                </div>
+                <p className="text-[9px] text-[#6f7890] leading-snug">
+                  Leave blank to use the default relative proxy. Change this if your frontend runs on a different domain or port.
+                </p>
+              </div>
+            )}
+
             {error && <div className="flex gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-700 text-xs"><AlertCircle size={16}/>{error}</div>}
             <div><label className="form-label" htmlFor="email">Email address</label><div className="relative"><Mail className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} className="form-input pl-11" required/></div></div>
             <div><div className="flex justify-between"><label className="form-label" htmlFor="password">Password</label><span className="text-[10px] text-[#155eef] font-bold">Demo credentials filled</span></div><div className="relative"><Lock className="absolute left-4 top-3.5 h-4 w-4 text-[#8b94a8]"/><input id="password" type="password" value={password} onChange={e=>setPassword(e.target.value)} className="form-input pl-11" required/></div></div>
-            <button disabled={loading || backendStatus === 'offline'} className="w-full btn-primary py-3.5">{loading ? <><Loader2 size={17} className="animate-spin"/>Signing in...</> : <>Enter {accounts[role].label}<ArrowRight size={17}/></>}</button>
+            <button disabled={loading} className="w-full btn-primary py-3.5">{loading ? <><Loader2 size={17} className="animate-spin"/>Signing in...</> : <>Enter {accounts[role].label}<ArrowRight size={17}/></>}</button>
             
             <div className="pt-2 border-t border-gray-100 flex items-center justify-center gap-1.5 text-[10px] font-medium text-[#7b8499]">
               {backendStatus === 'checking' && (
@@ -125,7 +168,7 @@ export default function Login({ onLoginSuccess, backendUrl }) {
               {backendStatus === 'offline' && (
                 <>
                   <AlertCircle size={11} className="text-rose-500" />
-                  <span className="text-rose-600 font-bold">Backend Offline (Port 5001)</span>
+                  <span className="text-rose-600 font-bold">Backend Offline</span>
                 </>
               )}
             </div>
