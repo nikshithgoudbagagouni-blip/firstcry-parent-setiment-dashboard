@@ -20,9 +20,9 @@ const savedSession = (() => {
 })();
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(savedSession.token && savedSession.user));
-  const [user, setUser] = useState(savedSession.user || null);
-  const [token, setToken] = useState(savedSession.token || '');
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [selectedParentId, setSelectedParentId] = useState('');
 
